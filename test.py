@@ -10,10 +10,10 @@ import os
 bot = Bot(token="7311526472:AAExrmlPJiDXVWZHHTtn1R9MazUURj1Tdfo")
 dp = Dispatcher()
 
-LOG_CHANNELS_DB = "home/log_channels.json"
-MODELS_DB = "home/models.json"
-THRESHOLDS_DB = "home/thresholds.json"
-USER_MESSAGES_DB = "home/user_messages.json"
+LOG_CHANNELS_DB = "/etc/secrets/log_channels.json"
+MODELS_DB = "/etc/secrets/models.json"
+THRESHOLDS_DB = "/etc/secrets/thresholds.json"
+USER_MESSAGES_DB = "/etc/secrets/user_messages.json"
 
 SPECIAL_USER_IDS = [7264930816, 1529997307]
 
