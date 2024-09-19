@@ -98,17 +98,18 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
         info_text = (
             f"<b>Настройки для группы:</b> {message.chat.title}\n\n"
-            f"<b>Лог-канал:</b> {log_channel_id}\n"
-            f"<b>Порог сообщений:</b> {threshold}\n\n"
+            f"<b>Лог-канал:</b> {log_channel_id} 📡\n"
+            f"<b>Порог сообщений:</b> {threshold} ✉️\n\n"
             f"<b>Настройки действий:</b>\n"
-            f"Подписка на уведомления: {subscribe_status}\n"
-            f"Мутирование пользователей: {mute_status}\n"
-            f"Удаление сообщений: {delete_message_status}\n"
-            f"Бан пользователей: {ban_status}\n"
-            f"Уведомления: {notification_status}\n"
+            f"Подписка на уведомления: {subscribe_status} 🔔\n"
+            f"Мутирование пользователей: {mute_status} 🤐\n"
+            f"Удаление сообщений: {delete_message_status} 🗑️\n"
+            f"Бан пользователей: {ban_status} 🚫\n"
+            f"Уведомления: {notification_status} 📢\n\n"
+            f"<i>Первая версия: Lost Samurai</i>"
         )
         await message.reply(info_text, parse_mode='html')
-
+        
     @dp.message(Command('help'))
     async def process_help_command(message: Message):
         await message.answer(help_text, parse_mode='html')
