@@ -1,9 +1,0 @@
-{
-    "-1002220782197": {
-        "subscribe": false,
-        "mute": false,
-        "delete_message": false,
-        "ban": false,
-        "notification": true
-    }
-}
