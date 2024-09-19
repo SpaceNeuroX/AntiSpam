@@ -3,7 +3,6 @@ import os
 from aiogram import Dispatcher, types
 from aiogram.types import Message, CallbackQuery
 from ruSpamLib import is_spam
-from aiogram.filters import Command
 from keyboard_utils import get_ban_keyboard
 
 LOG_CHANNELS_DB = "./log_channels.json"
@@ -50,7 +49,7 @@ async def is_group(message: Message):
         return
 
 def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
-    @dp.message(lambda message: message.new_chat_members)
+    @dp.message_handler(lambda message: message.new_chat_members)
     async def on_new_chat_members(message: Message):
         for new_member in message.new_chat_members:
             if new_member.id == bot.id:
@@ -72,12 +71,12 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         chat_settings_data[str(chat_id)] = chat_settings
         save_chat_settings(chat_settings_data)
 
-    @dp.message(Command('start'))
+    @dp.message_handler(commands=['start'])
     async def process_start_command(message: Message):
         start_message = await message.answer(start_text, parse_mode='html')
         dp['start_message_id'] = start_message.message_id
 
-    @dp.message(Command('info'))
+    @dp.message_handler(commands= ['info'])
     async def process_info_command(message: Message):
         chat_id = message.chat.id
 
@@ -109,12 +108,12 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             f"<i>Первая версия: Lost Samurai</i>"
         )
         await message.reply(info_text, parse_mode='html')
-        
-    @dp.message(Command('help'))
+
+    @dp.message_handler(commands=['help'])
     async def process_help_command(message: Message):
         await message.answer(help_text, parse_mode='html')
 
-    @dp.message(Command('setlog'))
+    @dp.message_handler(commands=['setlog'])
     async def process_setlog_command(message: Message):
         await is_group(message)
         if not await has_permission(message):
@@ -132,7 +131,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         save_data(LOG_CHANNELS_DB, log_channels)
         await message.reply(f"Лог-канал успешно установлен: {log_channel_id}")
 
-    @dp.message(Command('setthreshold'))
+    @dp.message_handler(commands=['setthreshold'])
     async def process_setthreshold_command(message: Message):
         await is_group(message)
 
@@ -152,7 +151,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         save_data(THRESHOLDS_DB, thresholds)
         await message.reply(f"Порог сообщений успешно установлен: {threshold}")
 
-    @dp.message(Command('setmute'))
+    @dp.message_handler(commands=['setmute'])
     async def process_setmute_command(message: Message):
         await is_group(message)
 
@@ -174,7 +173,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         save_chat_settings(chat_settings)
         await message.reply(f"Мутирование пользователей успешно {'включено' if mute else 'отключено'}.")
 
-    @dp.message(Command('setdeletemessage'))
+    @dp.message_handler(commands=['setdeletemessage'])
     async def process_setdeletemessage_command(message: Message):
         await is_group(message)
 
@@ -196,7 +195,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         save_chat_settings(chat_settings)
         await message.reply(f"Удаление сообщений успешно {'включено' if delete_message else 'отключено'}.")
 
-    @dp.message(Command('setban'))
+    @dp.message_handler(commands = ['setban'])
     async def process_setban_command(message: Message):
         await is_group(message)
 
@@ -218,7 +217,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         save_chat_settings(chat_settings)
         await message.reply(f"Бан пользователей успешно {'включен' if ban else 'отключен'}.")
 
-    @dp.message(Command('setnotification'))
+    @dp.message_handler(commands=['setnotification'])
     async def process_setnotification_command(message: Message):
         await is_group(message)
 
@@ -240,7 +239,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         save_chat_settings(chat_settings)
         await message.reply(f"Уведомления успешно {'включены' if notification else 'отключены'}.")
 
-    @dp.callback_query()
+    @dp.callback_query_handler()
     async def process_callback_query(callback_query: CallbackQuery):
         start_message_id = dp.get('start_message_id')
         data = callback_query.data
@@ -309,7 +308,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                                         chat_id=chat_id, message_id=callback_query.message.message_id)
 
 
-    @dp.message()
+    @dp.message_handler()
     async def process_message(message: Message):
         pred_average = False
         chat_id = message.chat.id
