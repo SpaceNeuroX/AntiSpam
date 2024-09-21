@@ -135,6 +135,40 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         save_data(LOG_CHANNELS_DB, log_channels)
         await message.reply(f"Лог-канал успешно установлен: {log_channel_id}")
 
+
+    def get_user_rank(message_count):
+        if message_count < 100:
+            return "Новичок 🌱"
+        elif 100 <= message_count < 500:
+            return "Опытный 🧑‍🤝‍🧑"
+        elif 500 <= message_count < 1000:
+            return "Сударь 👑"
+        else:
+            return "Царь 🦹‍♂️"
+        
+    @dp.message_handler(commands=['me'])
+    async def process_me_command(message: Message):
+        user_id = message.from_user.id
+        chat_id = message.chat.id
+        
+        if str(chat_id) not in user_messages or str(user_id) not in user_messages[str(chat_id)]:
+            await message.reply("Вы еще не написали ни одного сообщения в этом чате. 🥺")
+            return
+        
+        message_count = user_messages[str(chat_id)][str(user_id)]
+        rank = get_user_rank(message_count)
+        
+        if message.from_user.is_bot:
+            rank = "Бот 🤖"
+        elif await has_permission(message):
+            rank = "Властитель 👑"
+        
+        await message.reply(f"Пользователь: {message.from_user.full_name} 🧑‍🤝‍🧑\n"
+                        f"ID: {user_id} 🔢\n"
+                        f"Количество сообщений: {message_count} 💬\n"
+                        f"Ранг: {rank}")
+
+        
     @dp.message_handler(commands=['setdeletemat'])
     async def process_setmute_command(message: Message):
         await is_group(message)
@@ -285,7 +319,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
     @dp.callback_query_handler()
     async def process_callback_query(callback_query: CallbackQuery):
-        start_message_id = dp.get('start_message_id')
         data = callback_query.data
         user_id = callback_query.from_user.id
         chat_id = callback_query.message.chat.id
