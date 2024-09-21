@@ -2,6 +2,7 @@ import json
 import os
 from aiogram import Dispatcher, types
 from aiogram.types import Message, CallbackQuery
+from AntiMat import filter_text
 from ruSpamLib import is_spam
 from keyboard_utils import get_ban_keyboard
 
@@ -65,7 +66,8 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             'mute': False,
             'delete_message': True,
             'ban': False,
-            'notification': True
+            'notification': True,
+            'deletemat': True
         }
         chat_settings_data = load_chat_settings()
         chat_settings_data[str(chat_id)] = chat_settings
@@ -94,6 +96,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         delete_message_status = "Включено" if chat_settings.get('delete_message', False) else "Отключено"
         ban_status = "Включен" if chat_settings.get('ban', False) else "Отключен"
         notification_status = "Включены" if chat_settings.get('notification', False) else "Отключены"
+        matdelete = "Включены" if chat_settings.get('deletemat', True) else "Отключены"
 
         info_text = (
             f"<b>Настройки для группы:</b> {message.chat.title}\n\n"
@@ -104,8 +107,9 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             f"Мутирование пользователей: {mute_status} 🤐\n"
             f"Удаление сообщений: {delete_message_status} 🗑️\n"
             f"Бан пользователей: {ban_status} 🚫\n"
-            f"Уведомления: {notification_status} 📢\n\n"
-            f"<i>Первая версия: Lost Samurai</i>"
+            f"Уведомления: {notification_status} 📢\n"
+            f"Удаление матов: {matdelete} 📢\n\n"
+            f"<i>Первая версия: Lost Samurai 0.2</i>"
         )
         await message.reply(info_text, parse_mode='html')
 
@@ -130,6 +134,28 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         log_channels[str(chat_id)] = log_channel_id
         save_data(LOG_CHANNELS_DB, log_channels)
         await message.reply(f"Лог-канал успешно установлен: {log_channel_id}")
+
+    @dp.message_handler(commands=['setdeletemat'])
+    async def process_setmute_command(message: Message):
+        await is_group(message)
+
+        if not await has_permission(message):
+            await message.reply("Только администратор или пользователь с особыми правами может изменить настройки.")
+            return
+
+        chat_id = message.chat.id
+        parts = message.text.split()
+        if len(parts) != 2:
+            await message.reply("Использование команды: /setdeletemat <True/False>")
+            return
+
+        deletemat = parts[1].lower() == 'true'
+        chat_settings = load_chat_settings()
+        if str(chat_id) not in chat_settings:
+            chat_settings[str(chat_id)] = {}
+        chat_settings[str(chat_id)]['deletemat'] = deletemat
+        save_chat_settings(chat_settings)
+        await message.reply(f"Удаление мата успешно {'включено' if deletemat else 'отключено'}.")
 
     @dp.message_handler(commands=['setthreshold'])
     async def process_setthreshold_command(message: Message):
@@ -194,6 +220,24 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         chat_settings[str(chat_id)]['delete_message'] = delete_message
         save_chat_settings(chat_settings)
         await message.reply(f"Удаление сообщений успешно {'включено' if delete_message else 'отключено'}.")
+
+    @dp.message_handler(commands=['prof'])
+    async def handle_prof_command(message: types.Message):
+        argument = message.get_args()
+        
+        if argument:
+            if '**' in filter_text(argument):
+                await message.reply(f'❌ В тексте обнаружен мат! {filter_text(argument)}')
+        
+            elif is_spam(message.text, model_name="spamNS_v6"):
+                await message.reply('❌ Обнаружен спам!')
+            
+            else:
+                await message.reply('✅ Текст не содержит матерных слов.')
+        
+        else:
+            await message.reply('Пожалуйста, введите текст после команды /prof.')
+
 
     @dp.message_handler(commands = ['setban'])
     async def process_setban_command(message: Message):
@@ -328,32 +372,30 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         chat_settings = load_chat_settings().get(str(chat_id), {})
 
         pred_average = is_spam(message.text, model_name="spamNS_v6")
+        
+        filtered_message_text = filter_text(message.text)
 
-        if pred_average:
-            if chat_settings.get('delete_message',True):
+        if pred_average or (message.text != filtered_message_text and chat_settings.get('deletemat', True)):
+            if chat_settings.get('delete_message', True):
                 await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
-            if chat_settings.get('ban', False):
+            if chat_settings.get('ban', False) and pred_average:
                 await bot.ban_chat_member(chat_id=message.chat.id, user_id=message.from_user.id)
 
-            if chat_settings.get('mute', False):
-                await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id,
-                                               can_send_messages=False)
+            if chat_settings.get('mute', False) and pred_average:
+                await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id, can_send_messages=False)
 
             if chat_settings.get('notification', True):
                 log_channel_id = log_channels.get(str(message.chat.id))
 
                 if log_channel_id:
                     keyboard = get_ban_keyboard(message.from_user.id, message.chat.id)
-                    await bot.send_message(log_channel_id,
-                                           f"Сообщение от @{message.from_user.username} удалено в {message.chat.title}:\n\n{message.text}",
-                                           reply_markup=keyboard)
+                    await bot.send_message(
+                        log_channel_id,
+                        f"Сообщение от @{message.from_user.username} удалено в {message.chat.title}:\n\n{filtered_message_text}",
+                        reply_markup=keyboard
+                    )
                     await bot.send_message(
                         chat_id,
-                        f"💬 Сообщение от @{message.from_user.username} было удалено за рекламу! 🚫\n"
-                        "Если существует лог-канал, модераторы уже получили это сообщение на проверку. 👮♂️\n\n"
-                        "⚠️ **Напоминаем:**\n"
-                        "❌ Пожалуйста, не размещайте рекламные сообщения, чтобы избежать блокировки!"
-                    )
-
-
+                        f"💬 Сообщение удалено за {'рекламу' if pred_average else 'спам'} от @{message.from_user.username or message.from_user.id}! 🚫"
+                        )
