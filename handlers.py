@@ -67,7 +67,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             'delete_message': True,
             'ban': False,
             'notification': True,
-            'deletemat': True
+            'deletemat': False
         }
         chat_settings_data = load_chat_settings()
         chat_settings_data[str(chat_id)] = chat_settings
@@ -96,7 +96,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         delete_message_status = "Включено" if chat_settings.get('delete_message', False) else "Отключено"
         ban_status = "Включен" if chat_settings.get('ban', False) else "Отключен"
         notification_status = "Включены" if chat_settings.get('notification', False) else "Отключены"
-        matdelete = "Включены" if chat_settings.get('deletemat', True) else "Отключены"
+        matdelete = "Включены" if chat_settings.get('deletemat', False) else "Отключены"
 
         info_text = (
             f"<b>Настройки для группы:</b> {message.chat.title}\n\n"
@@ -109,7 +109,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             f"Бан пользователей: {ban_status} 🚫\n"
             f"Уведомления: {notification_status} 📢\n"
             f"Удаление матов: {matdelete} 📢\n\n"
-            f"<i>Первая версия: Lost Samurai 0.2</i>"
+            f"<i>Первая версия: Lost Samurai 0.3</i>"
         )
         await message.reply(info_text, parse_mode='html')
 
@@ -163,7 +163,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         elif await has_permission(message):
             rank = "Властитель 👑"
         
-        await message.reply(f"Пользователь: {message.from_user.full_name} 🧑‍🤝‍🧑\n"
+        await message.reply(f"Пользователь: {message.from_user.full_name}\n"
                         f"ID: {user_id} 🔢\n"
                         f"Количество сообщений: {message_count} 💬\n"
                         f"Ранг: {rank}")
@@ -262,12 +262,11 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         if argument:
             if '**' in filter_text(argument):
                 await message.reply(f'❌ В тексте обнаружен мат! {filter_text(argument)}')
-        
             elif is_spam(message.text, model_name="spamNS_v6"):
                 await message.reply('❌ Обнаружен спам!')
             
             else:
-                await message.reply('✅ Текст не содержит матерных слов.')
+                await message.reply('✅ Текст не содержит матерных слов, а также рекламы.')
         
         else:
             await message.reply('Пожалуйста, введите текст после команды /prof.')
@@ -404,11 +403,11 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
         chat_settings = load_chat_settings().get(str(chat_id), {})
 
-        pred_average = is_spam(message.text, model_name="spamNS_v6")
+        pred_average, confidence = is_spam(message.text, model_name="spamNS_v6")
         
         filtered_message_text = filter_text(message.text)
 
-        if pred_average or (message.text != filtered_message_text and chat_settings.get('deletemat', True)):
+        if pred_average or (message.text != filtered_message_text and chat_settings.get('deletemat', False)):
             if chat_settings.get('delete_message', True):
                 await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
@@ -425,10 +424,10 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                     keyboard = get_ban_keyboard(message.from_user.id, message.chat.id)
                     await bot.send_message(
                         log_channel_id,
-                        f"Сообщение от @{message.from_user.username} удалено в {message.chat.title}:\n\n{filtered_message_text}",
+                        f"Сообщение от @{message.from_user.username} удалено в {message.chat.title}:\n\n{filtered_message_text}, вероятность модели: {confidence}",
                         reply_markup=keyboard
                     )
                     await bot.send_message(
                         chat_id,
-                        f"💬 Сообщение удалено за {'рекламу' if pred_average else 'спам'} от @{message.from_user.username or message.from_user.id}! 🚫"
+                        f"💬 Сообщение удалено за {'рекламу' if pred_average else 'маты'} от @{message.from_user.username or message.from_user.id}! 🚫 Вероятность модели: {confidence}"
                         )
