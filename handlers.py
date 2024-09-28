@@ -109,7 +109,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             f"Бан пользователей: {ban_status} 🚫\n"
             f"Уведомления: {notification_status} 📢\n"
             f"Удаление матов: {matdelete} 📢\n\n"
-            f"<i>Первая версия: Lost Samurai 0.3</i>"
+            f"<i>Первая версия: Lost Samurai 0.4</i>"
         )
         await message.reply(info_text, parse_mode='html')
 
@@ -140,7 +140,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         if message_count < 100:
             return "Новичок 🌱"
         elif 100 <= message_count < 500:
-            return "Опытный 🧑‍🤝‍🧑"
+            return "Опытный"
         elif 500 <= message_count < 1000:
             return "Сударь 👑"
         else:
@@ -258,13 +258,11 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
     @dp.message_handler(commands=['prof'])
     async def handle_prof_command(message: types.Message):
         argument = message.get_args()
-        
         if argument:
             if '**' in filter_text(argument):
-                await message.reply(f'❌ В тексте обнаружен мат! {filter_text(argument)}')
-            elif is_spam(message.text, model_name="spamNS_v6"):
-                await message.reply('❌ Обнаружен спам!')
-            
+                await message.reply(f'❌ В тексте обнаружен мат!')
+            elif is_spam(argument, model_name="spamNS_v6"):
+                await message.reply('❌ Обнаружена реклама!')
             else:
                 await message.reply('✅ Текст не содержит матерных слов, а также рекламы.')
         
@@ -324,14 +322,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
         if data.startswith('ban_'):
             target_user_id, target_chat_id = map(int, data.split('_')[1:])
-
-            if callback_query.from_user.id == 1529997307:
-                await bot.answer_callback_query(
-                    callback_query.id,
-                    text="Вы заблокированы владельцем и не можете выполнять эту операцию."
-                )
-                return
-
             try:
                 chat_member = await bot.get_chat_member(chat_id=target_chat_id, user_id=target_user_id)
                 if chat_member.status in ['administrator', 'creator']:
@@ -398,23 +388,28 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         user_messages[str(chat_id)][str(user_id)] += 1
         save_data(USER_MESSAGES_DB, user_messages)
 
-        if user_messages[str(chat_id)][str(user_id)] > threshold:
-            return
-
         chat_settings = load_chat_settings().get(str(chat_id), {})
 
         pred_average, confidence = is_spam(message.text, model_name="spamNS_v6")
         
         filtered_message_text = filter_text(message.text)
 
-        if pred_average or (message.text != filtered_message_text and chat_settings.get('deletemat', False)):
+        if (pred_average and user_messages[str(chat_id)][str(user_id)] < threshold) or (message.text != filtered_message_text and chat_settings.get('deletemat', False)):
             if chat_settings.get('delete_message', True):
                 await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
             if chat_settings.get('ban', False) and pred_average:
+                if has_permission(message):
+                    await bot.send_message("Невозможно заблокировать администратора!")
+                    return
+                
                 await bot.ban_chat_member(chat_id=message.chat.id, user_id=message.from_user.id)
 
             if chat_settings.get('mute', False) and pred_average:
+                if has_permission(message):
+                    await bot.send_message("Невозможно замутить администратора!")
+                    return
+                
                 await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id, can_send_messages=False)
 
             if chat_settings.get('notification', True):
@@ -427,7 +422,12 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                         f"Сообщение от @{message.from_user.username} удалено в {message.chat.title}:\n\n{filtered_message_text}, вероятность модели: {confidence}",
                         reply_markup=keyboard
                     )
+                    if pred_average:
+                        message_text = f"💬 Сообщение удалено за рекламу от @{message.from_user.username or message.from_user.id}! 🚫 Вероятность: {confidence}"
+                    else:
+                        message_text = f"💬 Сообщение удалено за маты от @{message.from_user.username or message.from_user.id}!"
+
                     await bot.send_message(
                         chat_id,
-                        f"💬 Сообщение удалено за {'рекламу' if pred_average else 'маты'} от @{message.from_user.username or message.from_user.id}! 🚫 Вероятность модели: {confidence}"
-                        )
+                        message_text
+                    )
