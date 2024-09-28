@@ -39,6 +39,9 @@
 ## Подключение и настройка
 Код использует библиотеку **aiogram** для работы с Telegram API. Бот должен быть добавлен в группу, и у него должны быть соответствующие права для выполнения всех команд.
 
+
+### LICENCE
+
 This software is licensed under the GNU General Public License (GPL) version 3.
 
 Copyright (C) [2024] [NeuroSpaceX]
