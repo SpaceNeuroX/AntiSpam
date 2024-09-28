@@ -204,9 +204,10 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             if '**' in filter_text(argument):
                 await message.reply('❌ Profanity detected in the text!')
             else:
-                is_spam_result = is_spam(message=argument, model_name="spamNS_v6")
+                is_spam_result, confidence = is_spam(message=message.text, model_name="spamNS_v6", multi_model=False)
                 if is_spam_result:
-                    await message.reply('❌ Advertisement detected!')
+                    await message.reply(f'❌ Advertisement detected! Confidence: {confidence:.2f}')
+
                 else:
                     await message.reply('✅ The text contains no profanity or advertisements.')
         else:
