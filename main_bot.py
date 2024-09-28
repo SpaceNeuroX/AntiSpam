@@ -1,10 +1,25 @@
+# This code sets up handlers for a Telegram bot using the aiogram library.
+# It includes handlers for various commands and message processing.
+#
+# Author: @NeuroSpaceX
+#
+# Libraries used:
+# - aiogram: Library for building Telegram bots.
+# - AntiMat: Module for filtering text (possibly for profanity).
+# - ruSpamLib: Library for spam detection. Developed by @NeuroSpaceX.
+#   This library is licensed under a non-commercial use license.
+#   You are allowed to use it only for non-commercial purposes and must credit the author.
+# - keyboard_utils: Module containing functions to generate keyboards.
+# License:
+# This code is licensed under a non-commercial use license.
+# You are allowed to use it only for non-commercial purposes and must credit the author @NeuroSpaceX.
+		
 import asyncio
-from aiogram import Bot, Dispatcher, types
-from aiogram.contrib.middlewares.logging import LoggingMiddleware
+from aiogram import Bot, Dispatcher
 from handlers import setup_handlers
 from text_content import get_start_text, get_help_text
 
-API_TOKEN = "7311526472:AAHVqVHIu0s7a2XqNIg4G6N0nnVrWm_2Dn4"
+API_TOKEN = ""
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)

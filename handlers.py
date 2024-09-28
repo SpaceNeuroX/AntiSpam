@@ -1,44 +1,10 @@
 import json
-import os
+from utils import *
 from aiogram import Dispatcher, types
 from aiogram.types import Message, CallbackQuery
 from AntiMat import filter_text
 from ruSpamLib import is_spam
 from keyboard_utils import get_ban_keyboard
-
-LOG_CHANNELS_DB = "./log_channels.json"
-THRESHOLDS_DB = "./thresholds.json"
-USER_MESSAGES_DB = "./user_messages.json"
-WRONG_MESSAGES = "./wrong_messages.json"
-BANNED_MESSAGES_DB = "./banned_messages.json"
-CHAT_SETTINGS_DB = "./chat_settings.json"
-BANLIST_DB = "./banlist.json"
-
-SPECIAL_USER_IDS = [7264930816]
-
-def load_data(db_file):
-    if os.path.exists(db_file):
-        with open(db_file, "r") as file:
-            return json.load(file)
-    return {}
-
-def save_data(db_file, data):
-    with open(db_file, "w") as file:
-        json.dump(data, file, ensure_ascii=False, indent=4)
-
-log_channels = load_data(LOG_CHANNELS_DB)
-thresholds = load_data(THRESHOLDS_DB)
-user_messages = load_data(USER_MESSAGES_DB)
-banned_messages = load_data(BANNED_MESSAGES_DB)
-chat_settings_data = load_data(CHAT_SETTINGS_DB)
-banlist = load_data(BANLIST_DB)
-
-
-def load_chat_settings():
-    return chat_settings_data
-
-def save_chat_settings(data):
-    save_data(CHAT_SETTINGS_DB, data)
 
 async def has_permission(message: types.Message) -> bool:
     chat_member = await message.bot.get_chat_member(message.chat.id, message.from_user.id)
@@ -46,7 +12,7 @@ async def has_permission(message: types.Message) -> bool:
 
 async def is_group(message: Message):
     if not message.chat.type in ['group', 'supergroup']:
-        await message.reply("Эту команду можно использовать только в группе или супер-группе.")
+        await message.reply("This command can only be used in a group or supergroup.")
         return
 
 def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
@@ -58,20 +24,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                 await initialize_chat_settings(chat_id)
             elif new_member.id in banlist:
                 chat_id = message.chat.id
-                await message.reply(f"🚨 Внимание! Пользователь с ID {new_member.id} присоединился к группе. Это возможный спамер из нашей базы данных!")
-
-    async def initialize_chat_settings(chat_id):
-        chat_settings = {
-            'subscribe': False,
-            'mute': False,
-            'delete_message': True,
-            'ban': False,
-            'notification': True,
-            'deletemat': False
-        }
-        chat_settings_data = load_chat_settings()
-        chat_settings_data[str(chat_id)] = chat_settings
-        save_chat_settings(chat_settings_data)
+                await message.reply(f"⚠️ Attention! User with ID {new_member.id} has joined the group. This is a potential spammer from our database!")
 
     @dp.message_handler(commands=['start'])
     async def process_start_command(message: Message):
@@ -83,33 +36,33 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         chat_id = message.chat.id
 
         if not await has_permission(message):
-            await message.reply("Только администратор или пользователь с особыми правами может получить информацию.")
+            await message.reply("Only an administrator or user with special permissions can access this information.")
             return
 
-        log_channel_id = log_channels.get(str(chat_id), "Не установлен")
+        log_channel_id = log_channels.get(str(chat_id), "Not set")
         threshold = thresholds.get(str(chat_id), 10)
 
         chat_settings = load_chat_settings().get(str(chat_id), {})
 
-        subscribe_status = "Включена" if chat_settings.get('subscribe', False) else "Отключена"
-        mute_status = "Включен" if chat_settings.get('mute', False) else "Отключен"
-        delete_message_status = "Включено" if chat_settings.get('delete_message', False) else "Отключено"
-        ban_status = "Включен" if chat_settings.get('ban', False) else "Отключен"
-        notification_status = "Включены" if chat_settings.get('notification', False) else "Отключены"
-        matdelete = "Включены" if chat_settings.get('deletemat', False) else "Отключены"
+        subscribe_status = "Enabled" if chat_settings.get('subscribe', False) else "Disabled"
+        mute_status = "Enabled" if chat_settings.get('mute', False) else "Disabled"
+        delete_message_status = "Enabled" if chat_settings.get('delete_message', False) else "Disabled"
+        ban_status = "Enabled" if chat_settings.get('ban', False) else "Disabled"
+        notification_status = "Enabled" if chat_settings.get('notification', False) else "Disabled"
+        matdelete = "Enabled" if chat_settings.get('deletemat', False) else "Disabled"
 
         info_text = (
-            f"<b>Настройки для группы:</b> {message.chat.title}\n\n"
-            f"<b>Лог-канал:</b> {log_channel_id} 📡\n"
-            f"<b>Порог сообщений:</b> {threshold} ✉️\n\n"
-            f"<b>Настройки действий:</b>\n"
-            f"Подписка на уведомления: {subscribe_status} 🔔\n"
-            f"Мутирование пользователей: {mute_status} 🤐\n"
-            f"Удаление сообщений: {delete_message_status} 🗑️\n"
-            f"Бан пользователей: {ban_status} 🚫\n"
-            f"Уведомления: {notification_status} 📢\n"
-            f"Удаление матов: {matdelete} 📢\n\n"
-            f"<i>Первая версия: Lost Samurai 0.4</i>"
+            f"<b>Settings for group:</b> {message.chat.title}\n\n"
+            f"<b>Log channel:</b> {log_channel_id} 📡\n"
+            f"<b>Message threshold:</b> {threshold} ✉️\n\n"
+            f"<b>Action settings:</b>\n"
+            f"Subscribe to notifications: {subscribe_status} 🔔\n"
+            f"Mute users: {mute_status} 🤐\n"
+            f"Delete messages: {delete_message_status} 🗑️\n"
+            f"Ban users: {ban_status} 🚫\n"
+            f"Notifications: {notification_status} 📢\n"
+            f"Delete profanity: {matdelete} 📢\n\n"
+            f"<i>First version: Lost Samurai 0.4</i>"
         )
         await message.reply(info_text, parse_mode='html')
 
@@ -121,66 +74,54 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
     async def process_setlog_command(message: Message):
         await is_group(message)
         if not await has_permission(message):
-            await message.reply("Только администратор или пользователь с особыми правами может установить лог-канал.")
+            await message.reply("Only an administrator or user with special permissions can set the log channel.")
             return
 
         chat_id = message.chat.id
         parts = message.text.split()
         if len(parts) != 2:
-            await message.reply("Использование команды: /setlog <channel_id>")
+            await message.reply("Usage: /setlog <channel_id>")
             return
 
         log_channel_id = parts[1]
         log_channels[str(chat_id)] = log_channel_id
         save_data(LOG_CHANNELS_DB, log_channels)
-        await message.reply(f"Лог-канал успешно установлен: {log_channel_id}")
+        await message.reply(f"Log channel successfully set: {log_channel_id}")
 
-
-    def get_user_rank(message_count):
-        if message_count < 100:
-            return "Новичок 🌱"
-        elif 100 <= message_count < 500:
-            return "Опытный"
-        elif 500 <= message_count < 1000:
-            return "Сударь 👑"
-        else:
-            return "Царь 🦹‍♂️"
-        
     @dp.message_handler(commands=['me'])
     async def process_me_command(message: Message):
         user_id = message.from_user.id
         chat_id = message.chat.id
         
         if str(chat_id) not in user_messages or str(user_id) not in user_messages[str(chat_id)]:
-            await message.reply("Вы еще не написали ни одного сообщения в этом чате. 🥺")
+            await message.reply("You haven't sent any messages in this chat yet. 😢")
             return
         
         message_count = user_messages[str(chat_id)][str(user_id)]
         rank = get_user_rank(message_count)
         
         if message.from_user.is_bot:
-            rank = "Бот 🤖"
+            rank = "Bot 🤖"
         elif await has_permission(message):
-            rank = "Властитель 👑"
+            rank = "Ruler 👑"
         
-        await message.reply(f"Пользователь: {message.from_user.full_name}\n"
+        await message.reply(f"User: {message.from_user.full_name}\n"
                         f"ID: {user_id} 🔢\n"
-                        f"Количество сообщений: {message_count} 💬\n"
-                        f"Ранг: {rank}")
+                        f"Message count: {message_count} 💬\n"
+                        f"Rank: {rank}")
 
-        
     @dp.message_handler(commands=['setdeletemat'])
-    async def process_setmute_command(message: Message):
+    async def process_setdeletemat_command(message: Message):
         await is_group(message)
 
         if not await has_permission(message):
-            await message.reply("Только администратор или пользователь с особыми правами может изменить настройки.")
+            await message.reply("Only an administrator or user with special permissions can change settings.")
             return
 
         chat_id = message.chat.id
         parts = message.text.split()
         if len(parts) != 2:
-            await message.reply("Использование команды: /setdeletemat <True/False>")
+            await message.reply("Usage: /setdeletemat <True/False>")
             return
 
         deletemat = parts[1].lower() == 'true'
@@ -189,7 +130,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             chat_settings[str(chat_id)] = {}
         chat_settings[str(chat_id)]['deletemat'] = deletemat
         save_chat_settings(chat_settings)
-        await message.reply(f"Удаление мата успешно {'включено' if deletemat else 'отключено'}.")
+        await message.reply(f"Profanity deletion successfully {'enabled' if deletemat else 'disabled'}.")
 
     @dp.message_handler(commands=['setthreshold'])
     async def process_setthreshold_command(message: Message):
@@ -197,32 +138,33 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
         if not await has_permission(message):
             await message.reply(
-                "Только администратор или пользователь с особыми правами может установить порог сообщений.")
+                "Only an administrator or user with special permissions can set the message threshold."
+            )
             return
 
         chat_id = message.chat.id
         parts = message.text.split()
         if len(parts) != 2 or not parts[1].isdigit():
-            await message.reply("Использование команды: /setthreshold <threshold>")
+            await message.reply("Usage: /setthreshold <threshold>")
             return
 
         threshold = int(parts[1])
         thresholds[str(chat_id)] = threshold
         save_data(THRESHOLDS_DB, thresholds)
-        await message.reply(f"Порог сообщений успешно установлен: {threshold}")
+        await message.reply(f"Message threshold successfully set: {threshold}")
 
     @dp.message_handler(commands=['setmute'])
     async def process_setmute_command(message: Message):
         await is_group(message)
 
         if not await has_permission(message):
-            await message.reply("Только администратор или пользователь с особыми правами может изменить настройки.")
+            await message.reply("Only an administrator or user with special permissions can change settings.")
             return
 
         chat_id = message.chat.id
         parts = message.text.split()
         if len(parts) != 2:
-            await message.reply("Использование команды: /setmute <True/False>")
+            await message.reply("Usage: /setmute <True/False>")
             return
 
         mute = parts[1].lower() == 'true'
@@ -231,20 +173,20 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             chat_settings[str(chat_id)] = {}
         chat_settings[str(chat_id)]['mute'] = mute
         save_chat_settings(chat_settings)
-        await message.reply(f"Мутирование пользователей успешно {'включено' if mute else 'отключено'}.")
+        await message.reply(f"User muting successfully {'enabled' if mute else 'disabled'}.")
 
     @dp.message_handler(commands=['setdeletemessage'])
     async def process_setdeletemessage_command(message: Message):
         await is_group(message)
 
         if not await has_permission(message):
-            await message.reply("Только администратор или пользователь с особыми правами может изменить настройки.")
+            await message.reply("Only an administrator or user with special permissions can change settings.")
             return
 
         chat_id = message.chat.id
         parts = message.text.split()
         if len(parts) != 2:
-            await message.reply("Использование команды: /setdeletemessage <True/False>")
+            await message.reply("Usage: /setdeletemessage <True/False>")
             return
 
         delete_message = parts[1].lower() == 'true'
@@ -253,35 +195,35 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             chat_settings[str(chat_id)] = {}
         chat_settings[str(chat_id)]['delete_message'] = delete_message
         save_chat_settings(chat_settings)
-        await message.reply(f"Удаление сообщений успешно {'включено' if delete_message else 'отключено'}.")
+        await message.reply(f"Message deletion successfully {'enabled' if delete_message else 'disabled'}.")
 
     @dp.message_handler(commands=['prof'])
     async def handle_prof_command(message: types.Message):
         argument = message.get_args()
         if argument:
             if '**' in filter_text(argument):
-                await message.reply(f'❌ В тексте обнаружен мат!')
-            elif is_spam(argument, model_name="spamNS_v6"):
-                await message.reply('❌ Обнаружена реклама!')
+                await message.reply('❌ Profanity detected in the text!')
             else:
-                await message.reply('✅ Текст не содержит матерных слов, а также рекламы.')
-        
+                is_spam_result = is_spam(message=argument, model_name="spamNS_v6")
+                if is_spam_result:
+                    await message.reply('❌ Advertisement detected!')
+                else:
+                    await message.reply('✅ The text contains no profanity or advertisements.')
         else:
-            await message.reply('Пожалуйста, введите текст после команды /prof.')
-
+            await message.reply('❌ Please enter a text for checking.')
 
     @dp.message_handler(commands = ['setban'])
     async def process_setban_command(message: Message):
         await is_group(message)
 
         if not await has_permission(message):
-            await message.reply("Только администратор или пользователь с особыми правами может изменить настройки.")
+            await message.reply("Only an administrator or user with special permissions can change settings.")
             return
 
         chat_id = message.chat.id
         parts = message.text.split()
         if len(parts) != 2:
-            await message.reply("Использование команды: /setban <True/False>")
+            await message.reply("Usage: /setban <True/False>")
             return
 
         ban = parts[1].lower() == 'true'
@@ -290,20 +232,20 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             chat_settings[str(chat_id)] = {}
         chat_settings[str(chat_id)]['ban'] = ban
         save_chat_settings(chat_settings)
-        await message.reply(f"Бан пользователей успешно {'включен' if ban else 'отключен'}.")
+        await message.reply(f"User banning successfully {'enabled' if ban else 'disabled'}.")
 
     @dp.message_handler(commands=['setnotification'])
     async def process_setnotification_command(message: Message):
         await is_group(message)
 
         if not await has_permission(message):
-            await message.reply("Только администратор или пользователь с особыми правами может изменить настройки.")
+            await message.reply("Only an administrator or user with special permissions can change settings.")
             return
 
         chat_id = message.chat.id
         parts = message.text.split()
         if len(parts) != 2:
-            await message.reply("Использование команды: /setnotification <True/False>")
+            await message.reply("Usage: /setnotification <True/False>")
             return
 
         notification = parts[1].lower() == 'true'
@@ -312,7 +254,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             chat_settings[str(chat_id)] = {}
         chat_settings[str(chat_id)]['notification'] = notification
         save_chat_settings(chat_settings)
-        await message.reply(f"Уведомления успешно {'включены' if notification else 'отключены'}.")
+        await message.reply(f"Notifications successfully {'enabled' if notification else 'disabled'}.")
 
     @dp.callback_query_handler()
     async def process_callback_query(callback_query: CallbackQuery):
@@ -327,7 +269,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                 if chat_member.status in ['administrator', 'creator']:
                     await bot.answer_callback_query(
                         callback_query.id,
-                        text="Нельзя забанить администратора или владельца чата."
+                        text="Cannot ban an administrator or chat owner."
                     )
                     return
                 
@@ -337,16 +279,16 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                     save_data(BANLIST_DB, banlist)
 
                 await bot.ban_chat_member(chat_id=target_chat_id, user_id=target_user_id)
-                message_text = callback_query.message.text or "Сообщение было удалено или недоступно"
-                ban_message = f"✅ Пользователь {target_user_id} забанен\n\n"
-                ban_message += f"Забанил: {callback_query.from_user.full_name} (@{callback_query.from_user.username})\n"
+                message_text = callback_query.message.text or "Message was deleted or unavailable"
+                ban_message = f"✅ User {target_user_id} has been banned\n\n"
+                ban_message += f"Banned by: {callback_query.from_user.full_name} (@{callback_query.from_user.username})\n"
                 ban_message += f"{message_text}"
                 await bot.edit_message_text(
                     text=ban_message,
                     chat_id=chat_id,
                     message_id=callback_query.message.message_id
                 )
-                await bot.answer_callback_query(callback_query.id, text="Пользователь успешно забанен")
+                await bot.answer_callback_query(callback_query.id, text="User successfully banned")
 
                 banned_messages = load_data(BANNED_MESSAGES_DB)
                 banned_messages.append({
@@ -358,7 +300,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
             except Exception as e:
                 await bot.answer_callback_query(callback_query.id,
-                                                text=f"Ошибка при бане: {type(e).__name__}, {str(e)}")
+                                                text=f"Error while banning: {type(e).__name__}, {str(e)}")
 
         elif data.startswith("incorrect_"):
             with open(WRONG_MESSAGES, 'r') as file:
@@ -369,10 +311,9 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             with open(WRONG_MESSAGES, 'w') as file:
                 json.dump(wrong_messages, file, ensure_ascii=False, indent=4)
 
-            await bot.send_message(chat_id=-1002348384690, text=f"Неправильно определенное сообщение:\n\n{callback_query.message.text}")
-            await bot.edit_message_text(text="Спасибо за отклик! Это поможет нам делать более качественные модели!",
+            await bot.send_message(chat_id=-1002348384690, text=f"Incorrectly determined message:\n\n{callback_query.message.text}")
+            await bot.edit_message_text(text="Thank you for your feedback! This will help us improve our models!",
                                         chat_id=chat_id, message_id=callback_query.message.message_id)
-
 
     @dp.message_handler()
     async def process_message(message: Message):
@@ -400,14 +341,14 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
             if chat_settings.get('ban', False) and pred_average:
                 if has_permission(message):
-                    await bot.send_message("Невозможно заблокировать администратора!")
+                    await bot.send_message(chat_id, "Cannot ban an administrator!")
                     return
                 
                 await bot.ban_chat_member(chat_id=message.chat.id, user_id=message.from_user.id)
 
             if chat_settings.get('mute', False) and pred_average:
                 if has_permission(message):
-                    await bot.send_message("Невозможно замутить администратора!")
+                    await bot.send_message(chat_id, "Cannot mute an administrator!")
                     return
                 
                 await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id, can_send_messages=False)
@@ -419,13 +360,13 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                     keyboard = get_ban_keyboard(message.from_user.id, message.chat.id)
                     await bot.send_message(
                         log_channel_id,
-                        f"Сообщение от @{message.from_user.username} удалено в {message.chat.title}:\n\n{filtered_message_text}, вероятность модели: {confidence}",
+                        f"Message from @{message.from_user.username} deleted in {message.chat.title}:\n\n{filtered_message_text}, model probability: {confidence}",
                         reply_markup=keyboard
                     )
                     if pred_average:
-                        message_text = f"💬 Сообщение удалено за рекламу от @{message.from_user.username or message.from_user.id}! 🚫 Вероятность: {confidence}"
+                        message_text = f"💬 Message deleted for advertising by @{message.from_user.username or message.from_user.id}! 🚫 Probability: {confidence}"
                     else:
-                        message_text = f"💬 Сообщение удалено за маты от @{message.from_user.username or message.from_user.id}!"
+                        message_text = f"💬 Message deleted for profanity by @{message.from_user.username or message.from_user.id}!"
 
                     await bot.send_message(
                         chat_id,
