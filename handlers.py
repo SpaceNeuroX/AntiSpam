@@ -4,7 +4,13 @@ from aiogram import Dispatcher, types
 from aiogram.types import Message, CallbackQuery
 from AntiMat import filter_text
 from ruSpamLib import is_spam
+from aiogram import Bot, Dispatcher, types
+from aiogram.contrib.fsm_storage.memory import MemoryStorage
+import psutil
+from ping3 import ping
 from keyboard_utils import get_ban_keyboard
+
+storage = MemoryStorage()
 
 async def has_permission(message: types.Message) -> bool:
     chat_member = await message.bot.get_chat_member(message.chat.id, message.from_user.id)
@@ -109,6 +115,26 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                         f"ID: {user_id} 🔢\n"
                         f"Message count: {message_count} 💬\n"
                         f"Rank: {rank}")
+
+    @dp.message_handler(commands=['ping'])
+    async def ping_handler(message: types.Message):
+        ping_result = ping('google.com')
+        ping_time = f"{ping_result * 1000:.2f} ms" if ping_result is not None else "Ошибка пинга"
+
+        cpu_usage = psutil.cpu_percent()
+        memory_info = psutil.virtual_memory()
+        disk_info = psutil.disk_usage('/')
+
+        response = (
+            f"**Server Status:**\n"
+            f"- **Ping:** {ping_time} ms 🕒\n"
+            f"- **CPU Usage:** {cpu_usage}% 🖥️\n"
+            f"- **Memory Usage:** {memory_info.percent}% of {memory_info.total // (1024 ** 2)} MB 🧠\n"
+            f"- **Disk Usage:** {disk_info.percent}% of {disk_info.total // (1024 ** 3)} GB 💾\n"
+            f"- **Available Memory:** {memory_info.available // (1024 ** 2)} MB 📦\n"
+            f"- **Available Disk Space:** {disk_info.free // (1024 ** 3)} GB 🗄️"
+        )
+        await message.reply(response, parse_mode='Markdown')
 
     @dp.message_handler(commands=['setdeletemat'])
     async def process_setdeletemat_command(message: Message):
