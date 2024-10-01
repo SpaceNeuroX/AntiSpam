@@ -16,7 +16,7 @@ async def has_permission(message: types.Message) -> bool:
     chat_member = await message.bot.get_chat_member(message.chat.id, message.from_user.id)
     return chat_member.status in ["creator", "administrator"]
 
-async def is_group(message: Message, chat_id):
+async def is_group(message: Message):
     if not message.chat.type in ['group', 'supergroup']:
         await message.reply("This command can only be used in a group or supergroup.")
         return
@@ -42,7 +42,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         chat_id = message.chat.id
 
         if not await has_permission(message):
-            await message.reply_video(chat_id=chat_id, video='./video/reverse-flash-cw.mp4')        
+            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))        
             await message.reply("Only an administrator or user with special permissions can access this information.")
             return
 
@@ -81,7 +81,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
     async def process_setlog_command(message: Message):
         await is_group(message)
         if not await has_permission(message):
-            await message.reply_video(chat_id=chat_id, video='./video/reverse-flash-cw.mp4')
+            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
             await message.reply("Only an administrator or user with special permissions can set the log channel.")
             return
 
@@ -143,7 +143,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         await is_group(message)
 
         if not await has_permission(message):
-            await message.reply_video(chat_id=chat_id, video='./video/reverse-flash-cw.mp4')
+            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
             await message.reply("Only an administrator or user with special permissions can change settings.")
             return
 
@@ -166,7 +166,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         await is_group(message)
 
         if not await has_permission(message):
-            await message.reply_video(chat_id=chat_id, video='./video/reverse-flash-cw.mp4')
+            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
             await message.reply(
                 "Only an administrator or user with special permissions can set the message threshold."
             )
@@ -188,7 +188,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         await is_group(message)
 
         if not await has_permission(message):
-            await message.reply_video(chat_id=chat_id, video='./video/reverse-flash-cw.mp4')
+            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
             await message.reply("Only an administrator or user with special permissions can change settings.")
             return
 
@@ -211,7 +211,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         await is_group(message)
 
         if not await has_permission(message):
-            await message.reply_video(chat_id=chat_id, video='./video/reverse-flash-cw.mp4')
+            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
             await message.reply("Only an administrator or user with special permissions can change settings.")
             return
 
@@ -250,7 +250,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         await is_group(message)
 
         if not await has_permission(message):
-            await message.reply_video(chat_id=chat_id, video='./video/reverse-flash-cw.mp4')
+            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
             await message.reply("Only an administrator or user with special permissions can change settings.")
             return
 
@@ -273,7 +273,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         await is_group(message)
 
         if not await has_permission(message):
-            await message.reply_video(chat_id=chat_id, video='./video/reverse-flash-cw.mp4')
+            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
             await message.reply("Only an administrator or user with special permissions can change settings.")
             return
 
