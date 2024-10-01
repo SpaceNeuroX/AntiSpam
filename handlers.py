@@ -13,7 +13,8 @@ from keyboard_utils import get_ban_keyboard
 storage = MemoryStorage()
 
 async def has_permission(message: types.Message) -> bool:
-    chat_member = await message.bot.get_chat_member(message.chat.id, message.from_user.id)
+    user_id = message.from_user.id
+    chat_member = await message.bot.get_chat_member(message.chat.id, user_id)
     return chat_member.status in ["creator", "administrator"]
 
 async def is_group(message: Message):
@@ -71,7 +72,35 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             f"Delete profanity: {matdelete} 📢\n\n"
             f"<i>First version: Lost Samurai 0.4</i>"
         )
-        await message.reply(info_text, parse_mode='html')
+        await message.reply(info_text, parse_mode='html', reply_markup=settings_keyboard(chat_id))
+
+    
+    def settings_keyboard(chat_id):
+        chat_settings = load_chat_settings().get(str(chat_id), {})
+        keyboard = types.InlineKeyboardMarkup()
+        keyboard.add(
+            types.InlineKeyboardButton(
+                text=f"🔒 Ban: {'✅' if chat_settings.get('ban', False) else '❌'}",
+                callback_data='toggle_ban_user'
+            ),
+            types.InlineKeyboardButton(
+                text=f"🔇 Mute: {'✅' if chat_settings.get('mute', False) else '❌'}",
+                callback_data='toggle_mute_user'
+            ),
+            types.InlineKeyboardButton(
+                text=f"📩 Notify: {'✅' if chat_settings.get('notification', False) else '❌'}",
+                callback_data='toggle_notify_admin'
+            ),
+            types.InlineKeyboardButton(
+                text=f"🗑 Delete mess: {'✅' if chat_settings.get('delete_message', False) else '❌'}",
+                callback_data='toggle_delete_message'
+            ),
+            types.InlineKeyboardButton(
+                text=f"🗑 Delete mat russ: {'✅' if chat_settings.get('deletemat', False) else '❌'}",
+                callback_data='toggle_deletemat'  
+            )
+        )
+        return keyboard
 
     @dp.message_handler(commands=['help'])
     async def process_help_command(message: Message):
@@ -138,29 +167,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         )
         await message.reply(response, parse_mode='Markdown')
 
-    @dp.message_handler(commands=['setdeletemat'])
-    async def process_setdeletemat_command(message: Message):
-        await is_group(message)
-
-        if not await has_permission(message):
-            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
-            await message.reply("Only an administrator or user with special permissions can change settings.")
-            return
-
-        chat_id = message.chat.id
-        parts = message.text.split()
-        if len(parts) != 2:
-            await message.reply("Usage: /setdeletemat <True/False>")
-            return
-
-        deletemat = parts[1].lower() == 'true'
-        chat_settings = load_chat_settings()
-        if str(chat_id) not in chat_settings:
-            chat_settings[str(chat_id)] = {}
-        chat_settings[str(chat_id)]['deletemat'] = deletemat
-        save_chat_settings(chat_settings)
-        await message.reply(f"Profanity deletion successfully {'enabled' if deletemat else 'disabled'}.")
-
     @dp.message_handler(commands=['setthreshold'])
     async def process_setthreshold_command(message: Message):
         await is_group(message)
@@ -183,51 +189,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         save_data(THRESHOLDS_DB, thresholds)
         await message.reply(f"Message threshold successfully set: {threshold}")
 
-    @dp.message_handler(commands=['setmute'])
-    async def process_setmute_command(message: Message):
-        await is_group(message)
-
-        if not await has_permission(message):
-            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
-            await message.reply("Only an administrator or user with special permissions can change settings.")
-            return
-
-        chat_id = message.chat.id
-        parts = message.text.split()
-        if len(parts) != 2:
-            await message.reply("Usage: /setmute <True/False>")
-            return
-
-        mute = parts[1].lower() == 'true'
-        chat_settings = load_chat_settings()
-        if str(chat_id) not in chat_settings:
-            chat_settings[str(chat_id)] = {}
-        chat_settings[str(chat_id)]['mute'] = mute
-        save_chat_settings(chat_settings)
-        await message.reply(f"User muting successfully {'enabled' if mute else 'disabled'}.")
-
-    @dp.message_handler(commands=['setdeletemessage'])
-    async def process_setdeletemessage_command(message: Message):
-        await is_group(message)
-
-        if not await has_permission(message):
-            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
-            await message.reply("Only an administrator or user with special permissions can change settings.")
-            return
-
-        chat_id = message.chat.id
-        parts = message.text.split()
-        if len(parts) != 2:
-            await message.reply("Usage: /setdeletemessage <True/False>")
-            return
-
-        delete_message = parts[1].lower() == 'true'
-        chat_settings = load_chat_settings()
-        if str(chat_id) not in chat_settings:
-            chat_settings[str(chat_id)] = {}
-        chat_settings[str(chat_id)]['delete_message'] = delete_message
-        save_chat_settings(chat_settings)
-        await message.reply(f"Message deletion successfully {'enabled' if delete_message else 'disabled'}.")
 
     @dp.message_handler(commands=['prof'])
     async def handle_prof_command(message: types.Message):
@@ -245,57 +206,12 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         else:
             await message.reply('❌ Please enter a text for checking.')
 
-    @dp.message_handler(commands = ['setban'])
-    async def process_setban_command(message: Message):
-        await is_group(message)
-
-        if not await has_permission(message):
-            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
-            await message.reply("Only an administrator or user with special permissions can change settings.")
-            return
-
-        chat_id = message.chat.id
-        parts = message.text.split()
-        if len(parts) != 2:
-            await message.reply("Usage: /setban <True/False>")
-            return
-
-        ban = parts[1].lower() == 'true'
-        chat_settings = load_chat_settings()
-        if str(chat_id) not in chat_settings:
-            chat_settings[str(chat_id)] = {}
-        chat_settings[str(chat_id)]['ban'] = ban
-        save_chat_settings(chat_settings)
-        await message.reply(f"User banning successfully {'enabled' if ban else 'disabled'}.")
-
-    @dp.message_handler(commands=['setnotification'])
-    async def process_setnotification_command(message: Message):
-        await is_group(message)
-
-        if not await has_permission(message):
-            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
-            await message.reply("Only an administrator or user with special permissions can change settings.")
-            return
-
-        chat_id = message.chat.id
-        parts = message.text.split()
-        if len(parts) != 2:
-            await message.reply("Usage: /setnotification <True/False>")
-            return
-
-        notification = parts[1].lower() == 'true'
-        chat_settings = load_chat_settings()
-        if str(chat_id) not in chat_settings:
-            chat_settings[str(chat_id)] = {}
-        chat_settings[str(chat_id)]['notification'] = notification
-        save_chat_settings(chat_settings)
-        await message.reply(f"Notifications successfully {'enabled' if notification else 'disabled'}.")
-
     @dp.callback_query_handler()
     async def process_callback_query(callback_query: CallbackQuery):
         data = callback_query.data
         user_id = callback_query.from_user.id
         chat_id = callback_query.message.chat.id
+
 
         if data.startswith('ban_'):
             target_user_id, target_chat_id = map(int, data.split('_')[1:])
@@ -335,7 +251,37 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
             except Exception as e:
                 await bot.answer_callback_query(callback_query.id,
-                                                text=f"Error while banning: {type(e).__name__}, {str(e)}")
+                                                text=f"Error while banning: {type(e).__name__}, {str(e)}", show_alert=True)
+        elif data.startswith('toggle_'):
+            setting = data.split('_')[1]
+            print(setting)
+            if setting == "delete":
+                setting = "delete_message"
+            elif setting == "notify":
+                setting = "notification"
+
+            chat_settings = load_chat_settings()
+
+            if str(chat_id) not in chat_settings:
+                chat_settings[str(chat_id)] = {}
+
+            admins = await bot.get_chat_administrators(chat_id)
+            admin_ids = [admin.user.id for admin in admins]
+
+            if callback_query.from_user.id not in admin_ids:
+                await bot.answer_callback_query(callback_query.id, text="You are not an admin, so you cannot change settings.", show_alert=True)
+                return
+
+            current_value = chat_settings[str(chat_id)].get(setting, False)
+            chat_settings[str(chat_id)][setting] = not current_value
+            save_chat_settings(chat_settings)
+
+            await bot.edit_message_reply_markup(
+                chat_id=chat_id,
+                message_id=callback_query.message.message_id,
+                reply_markup=settings_keyboard(chat_id)
+            )
+            await bot.answer_callback_query(callback_query.id, text=f"Setting '{setting}' changed to {'✅' if not current_value else '❌'}", show_alert=True)
 
         elif data.startswith("incorrect_"):
             with open(WRONG_MESSAGES, 'r') as file:
@@ -349,7 +295,8 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             await bot.send_message(chat_id=-1002348384690, text=f"Incorrectly determined message:\n\n{callback_query.message.text}")
             await bot.edit_message_text(text="Thank you for your feedback! This will help us improve our models!",
                                         chat_id=chat_id, message_id=callback_query.message.message_id)
-
+            
+        
     @dp.message_handler()
     async def process_message(message: Message):
         pred_average = False
