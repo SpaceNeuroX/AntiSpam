@@ -4,7 +4,9 @@ from aiogram import Dispatcher, types
 from aiogram.types import Message, CallbackQuery
 from AntiMat import filter_text
 from ruSpamLib import is_spam
-from aiogram import Bot, Dispatcher, types
+from aiogram.types import Message, InputFile
+from io import BytesIO
+from aiogram import Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import psutil
 from ping3 import ping
@@ -32,6 +34,29 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             elif new_member.id in banlist:
                 chat_id = message.chat.id
                 await message.reply(f"⚠️ Внимание! Пользователь с ID {new_member.id} присоединился к группе. Это потенциальный спаммер из нашей базы данных!")
+
+    @dp.message_handler(commands=['dump_data'])
+    async def dump_data_command(message: Message):
+        user_id = message.from_user.id
+        if user_id not in SPECIAL_USER_IDS:
+            await message.reply("Эта команда доступна только для администратора.")
+            return
+
+        data = {
+            "log_channels": load_data(LOG_CHANNELS_DB),
+            "thresholds": load_data(THRESHOLDS_DB),
+            "user_messages": load_data(USER_MESSAGES_DB),
+            "banned_messages": load_data(BANNED_MESSAGES_DB),
+            "chat_settings": load_data(CHAT_SETTINGS_DB)
+        }
+
+        formatted_data = json.dumps(data, ensure_ascii=False, indent=4)
+
+        file_buffer = BytesIO()
+        file_buffer.write(formatted_data.encode('utf-8'))
+        file_buffer.seek(0)
+
+        await message.reply_document(InputFile(file_buffer, filename="dump_data.json"))
 
     @dp.message_handler(commands=['start'])
     async def process_start_command(message: Message):
@@ -204,6 +229,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         else:
             await message.reply('❌ Пожалуйста, введите текст для проверки.')
 
+    
     @dp.callback_query_handler()
     async def process_callback_query(callback_query: CallbackQuery):
         data = callback_query.data
@@ -237,14 +263,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                     message_id=callback_query.message.message_id
                 )
                 await bot.answer_callback_query(callback_query.id, text="Пользователь успешно забанен")
-
-                banned_messages = load_data(BANNED_MESSAGES_DB)
-                banned_messages.append({
-                    "user_id": target_user_id,
-                    "chat_id": target_chat_id,
-                    "message": message_text
-                })
-                save_data(BANNED_MESSAGES_DB, banned_messages)
 
             except Exception as e:
                 await bot.answer_callback_query(callback_query.id,
@@ -293,6 +311,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             await bot.edit_message_text(text="Спасибо за обратную связь! Это поможет нам улучшить наши модели!",
                                         chat_id=chat_id, message_id=callback_query.message.message_id)
             
+    
     @dp.message_handler()
     async def process_message(message: Message):
         pred_average = False
@@ -314,6 +333,15 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         filtered_message_text = filter_text(message.text)
 
         if (pred_average and user_messages[str(chat_id)][str(user_id)] < threshold) or (message.text != filtered_message_text and chat_settings.get('deletemat', False)):
+            
+            banned_messages = load_data(BANNED_MESSAGES_DB)
+            banned_messages.append({
+                "message": message_text
+            })
+            
+            save_data(BANNED_MESSAGES_DB, banned_messages)
+
+
             if chat_settings.get('delete_message', True):
                 await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
 
