@@ -334,11 +334,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
         if (pred_average and user_messages[str(chat_id)][str(user_id)] < threshold) or (message.text != filtered_message_text and chat_settings.get('deletemat', False)):
             
-            banned_messages = load_data(BANNED_MESSAGES_DB)
-            banned_messages.append({
-                "message": message_text
-            })
-            
             save_data(BANNED_MESSAGES_DB, banned_messages)
 
 
