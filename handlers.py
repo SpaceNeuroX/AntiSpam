@@ -126,7 +126,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             f"Удалить сообщения: {delete_message_status} 🗑️\n"
             f"Забанить пользователей: {ban_status} 🚫\n"
             f"Уведомления: {notification_status} 📢\n"
-            f"<i>Первая версия: Lost Samurai 0.4</i>"
+            f"<i>Первая версия: Lost Samurai 0.5</i>"
         )
         await message.reply(info_text, parse_mode='html', reply_markup=settings_keyboard(chat_id))
 
