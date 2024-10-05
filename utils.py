@@ -74,7 +74,7 @@ async def update_bot_command(message: Message):
         temp_dir = f'{temp_dir_base}{temp_dir_number}'
         os.makedirs(temp_dir, exist_ok=True)
 
-        git_token = os.getenv('GITHUB_TOKEN')
+        git_token = os.getenv('GIT_TOKEN')
         if not git_token:
             await message.reply("Токен GitHub не найден в переменных окружения.")
             return
