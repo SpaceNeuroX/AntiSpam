@@ -71,7 +71,7 @@ async def update_bot_command(message: Message):
     try:
         temp_dir = 'temp_bot_repo'
         if os.path.exists(temp_dir):
-            shutil.rmtree(temp_dir)
+            shutil.rmtree(temp_dir, ignore_errors=True)
         os.makedirs(temp_dir)
         await message.reply("Клонирование репозитория...")
         subprocess.run(['git', 'clone', 'https://github.com/SpaceNeuroX/AntiSpam', temp_dir], check=True)
@@ -86,7 +86,7 @@ async def update_bot_command(message: Message):
             if file.endswith('.py'):
                 shutil.copy(os.path.join(temp_dir, file), '.')
 
-        shutil.rmtree(temp_dir)
+        shutil.rmtree(temp_dir, ignore_errors=True)
 
         await message.reply("Перезапуск бота...")
         os.execl(sys.executable, sys.executable, *sys.argv)
@@ -95,3 +95,4 @@ async def update_bot_command(message: Message):
         await message.reply(f"Произошла ошибка при обновлении бота: {e}")
     except Exception as e:
         await message.reply(f"Произошла неизвестная ошибка: {e}")
+		

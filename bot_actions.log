@@ -10,3 +10,19 @@ client_session: <aiohttp.client.ClientSession object at 0x000001CA2ABC4850>
 2024-10-05 19:22:35,925 - INFO - Stop polling...
 2024-10-05 19:22:35,925 - ERROR - Unclosed client session
 client_session: <aiohttp.client.ClientSession object at 0x000001B7AFE94940>
+2024-10-05 19:23:18,531 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:23:18,548 - INFO - Start polling.
+2024-10-05 19:26:37,498 - WARNING - Polling is stopped.
+2024-10-05 19:26:37,538 - INFO - Stop polling...
+2024-10-05 19:26:37,547 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000023C8BF94BB0>
+2024-10-05 19:26:39,235 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:26:39,254 - INFO - Start polling.
+2024-10-05 19:27:02,381 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:27:02,402 - INFO - Start polling.
+2024-10-05 19:27:55,739 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:27:55,755 - INFO - Start polling.
+2024-10-05 19:28:49,710 - WARNING - Polling is stopped.
+2024-10-05 19:28:49,754 - INFO - Stop polling...
+2024-10-05 19:28:49,756 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000021907864BE0>
