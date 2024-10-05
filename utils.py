@@ -1,14 +1,10 @@
 import subprocess
 import os
-from aiogram.types import Message, InputFile
-import os
+from aiogram.types import Message
 import json
-from datetime import datetime
-import os
 import subprocess
 import shutil
 import sys
-import datetime
 
 THRESHOLDS_DB = "./thresholds.json"
 USER_MESSAGES_DB = "./user_messages.json"
@@ -78,8 +74,15 @@ async def update_bot_command(message: Message):
         temp_dir = f'{temp_dir_base}{temp_dir_number}'
         os.makedirs(temp_dir, exist_ok=True)
 
+        git_token = os.getenv('GITHUB_TOKEN')
+        if not git_token:
+            await message.reply("Токен GitHub не найден в переменных окружения.")
+            return
+
+        repo_url = f'https://{git_token}@github.com/SpaceNeuroX/AntiSpam.git'
+
         await message.reply("Клонирование репозитория...")
-        subprocess.run(['git', 'clone', 'https://github.com/SpaceNeuroX/AntiSpam', temp_dir], check=True)
+        subprocess.run(['git', 'clone', repo_url, temp_dir], check=True)
 
         await message.reply("Удаление старых файлов...")
         for file in os.listdir('.'):
@@ -102,4 +105,3 @@ async def update_bot_command(message: Message):
         await message.reply(f"Произошла ошибка при обновлении бота: {e}")
     except Exception as e:
         await message.reply(f"Произошла неизвестная ошибка: {e}")
-		
