@@ -270,7 +270,10 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         else:
             await message.reply('❌ Пожалуйста, введите текст для проверки.')
 
-    
+    @dp.message_handler(commands=['update_bot'])
+    async def process_update_bot_command(message: Message):
+        await update_bot_command(message)
+
     @dp.callback_query_handler()
     async def process_callback_query(callback_query: CallbackQuery):
         data = callback_query.data
@@ -376,9 +379,11 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
             if chat_settings.get('delete_message', True):
                 await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+                confidence_percent = int(confidence * 100)
+
                 await bot.send_message(
                     chat_id,
-                    f"Сообщение от @{message.from_user.username} удалено в {message.chat.title}:\n\n<tg-spoiler>{message.text}, вероятность модели: {confidence}</tg-spoiler>",
+                    f"Сообщение от @{message.from_user.username} удалено в {message.chat.title}:\n\n<tg-spoiler>{message.text}, вероятность модели: {confidence_percent}%</tg-spoiler>",
                     parse_mode="HTML",
                     reply_markup=keyboard
                 )

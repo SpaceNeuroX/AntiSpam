@@ -1,7 +1,12 @@
 import subprocess
 import os
+from aiogram.types import Message, InputFile
 import os
 import json
+import os
+import subprocess
+import shutil
+import sys
 
 THRESHOLDS_DB = "./thresholds.json"
 USER_MESSAGES_DB = "./user_messages.json"
@@ -56,3 +61,37 @@ def get_user_rank(message_count):
     else:
         return "Царь 🦹‍♂️"
     
+async def update_bot_command(message: Message):
+    user_id = message.from_user.id
+
+    if user_id not in SPECIAL_USER_IDS:
+        await message.reply("Только владелец бота может обновить бота.")
+        return
+
+    try:
+        temp_dir = 'temp_bot_repo'
+        if os.path.exists(temp_dir):
+            shutil.rmtree(temp_dir)
+        os.makedirs(temp_dir)
+        await message.reply("Клонирование репозитория...")
+        subprocess.run(['git', 'clone', 'https://github.com/SpaceNeuroX/AntiSpam', temp_dir], check=True)
+
+        await message.reply("Удаление старых файлов...")
+        for file in os.listdir('.'):
+            if file.endswith('.py'):
+                os.remove(file)
+
+        await message.reply("Копирование новых файлов...")
+        for file in os.listdir(temp_dir):
+            if file.endswith('.py'):
+                shutil.copy(os.path.join(temp_dir, file), '.')
+
+        shutil.rmtree(temp_dir)
+
+        await message.reply("Перезапуск бота...")
+        os.execl(sys.executable, sys.executable, *sys.argv)
+
+    except subprocess.CalledProcessError as e:
+        await message.reply(f"Произошла ошибка при обновлении бота: {e}")
+    except Exception as e:
+        await message.reply(f"Произошла неизвестная ошибка: {e}")
