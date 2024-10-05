@@ -3,10 +3,12 @@ import os
 from aiogram.types import Message, InputFile
 import os
 import json
+from datetime import datetime
 import os
 import subprocess
 import shutil
 import sys
+import datetime
 
 THRESHOLDS_DB = "./thresholds.json"
 USER_MESSAGES_DB = "./user_messages.json"
@@ -69,10 +71,14 @@ async def update_bot_command(message: Message):
         return
 
     try:
-        temp_dir = 'temp_bot_repo'
-        if os.path.exists(temp_dir):
-            shutil.rmtree(temp_dir, ignore_errors=True)
-        os.makedirs(temp_dir)
+        # Определяем номер временной папки
+        temp_dir_base = 'temp_bot_repo_'
+        temp_dir_number = 1
+        while os.path.exists(f'{temp_dir_base}{temp_dir_number}'):
+            temp_dir_number += 1
+        temp_dir = f'{temp_dir_base}{temp_dir_number}'
+        os.makedirs(temp_dir, exist_ok=True)
+
         await message.reply("Клонирование репозитория...")
         subprocess.run(['git', 'clone', 'https://github.com/SpaceNeuroX/AntiSpam', temp_dir], check=True)
 
@@ -86,10 +92,15 @@ async def update_bot_command(message: Message):
             if file.endswith('.py'):
                 shutil.copy(os.path.join(temp_dir, file), '.')
 
+        # Удаляем временную директорию после копирования
         shutil.rmtree(temp_dir, ignore_errors=True)
 
         await message.reply("Перезапуск бота...")
-        os.execl(sys.executable, sys.executable, *sys.argv)
+
+        # Запускаем новый процесс
+        subprocess.Popen([sys.executable, 'main_bot.py'])
+        # Завершаем текущий процесс
+        os._exit(0)
 
     except subprocess.CalledProcessError as e:
         await message.reply(f"Произошла ошибка при обновлении бота: {e}")

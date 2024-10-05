@@ -26,3 +26,123 @@ client_session: <aiohttp.client.ClientSession object at 0x0000023C8BF94BB0>
 2024-10-05 19:28:49,754 - INFO - Stop polling...
 2024-10-05 19:28:49,756 - ERROR - Unclosed client session
 client_session: <aiohttp.client.ClientSession object at 0x0000021907864BE0>
+2024-10-05 19:29:25,140 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:29:25,161 - INFO - Start polling.
+2024-10-05 19:29:35,533 - WARNING - Polling is stopped.
+2024-10-05 19:29:35,576 - INFO - Stop polling...
+2024-10-05 19:29:35,577 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002D8EBC04CA0>
+2024-10-05 19:29:35,578 - ERROR - Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000002D8EBBB3400>, 35185.64)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000002D8EBC04BB0>
+2024-10-05 19:29:35,579 - ERROR - Fatal error on SSL transport
+protocol: <asyncio.sslproto.SSLProtocol object at 0x000002D8EBC050C0>
+transport: <_ProactorSocketTransport fd=752 read=<_OverlappedFuture cancelled>>
+Traceback (most recent call last):
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\sslproto.py", line 690, in _process_write_backlog
+    self._transport.write(chunk)
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 365, in write
+    self._loop_writing(data=bytes(data))
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 401, in _loop_writing
+    self._write_fut = self._loop._proactor.send(self._sock, data)
+AttributeError: 'NoneType' object has no attribute 'send'
+2024-10-05 19:29:41,797 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:29:41,813 - INFO - Start polling.
+2024-10-05 19:29:50,769 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:29:50,795 - INFO - Start polling.
+2024-10-05 19:36:46,703 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:36:46,718 - INFO - Start polling.
+2024-10-05 19:37:14,878 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:37:14,899 - INFO - Start polling.
+2024-10-05 19:37:48,287 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:37:48,317 - INFO - Start polling.
+2024-10-05 19:39:02,685 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:39:02,702 - INFO - Start polling.
+2024-10-05 19:39:22,572 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:39:22,594 - INFO - Start polling.
+2024-10-05 19:41:02,381 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:41:02,413 - INFO - Start polling.
+2024-10-05 19:42:16,010 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:42:16,031 - INFO - Start polling.
+2024-10-05 19:44:04,510 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:44:04,527 - INFO - Start polling.
+2024-10-05 19:45:47,791 - WARNING - Polling is stopped.
+2024-10-05 19:45:47,824 - INFO - Stop polling...
+2024-10-05 19:45:47,824 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002C4DC748CA0>
+2024-10-05 19:45:49,606 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:45:49,625 - INFO - Start polling.
+2024-10-05 19:46:01,484 - WARNING - Polling is stopped.
+2024-10-05 19:46:01,515 - INFO - Stop polling...
+2024-10-05 19:46:01,531 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001A80F778CA0>
+2024-10-05 19:46:01,531 - ERROR - Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000001A80F717880>, 36173.125)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000001A80F778BB0>
+2024-10-05 19:46:01,531 - ERROR - Fatal error on SSL transport
+protocol: <asyncio.sslproto.SSLProtocol object at 0x000001A80F77AAA0>
+transport: <_ProactorSocketTransport fd=792 read=<_OverlappedFuture cancelled>>
+Traceback (most recent call last):
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\sslproto.py", line 690, in _process_write_backlog
+    self._transport.write(chunk)
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 365, in write
+    self._loop_writing(data=bytes(data))
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 401, in _loop_writing
+    self._write_fut = self._loop._proactor.send(self._sock, data)
+AttributeError: 'NoneType' object has no attribute 'send'
+2024-10-05 19:46:03,406 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:46:03,422 - INFO - Start polling.
+2024-10-05 19:47:11,988 - WARNING - Polling is stopped.
+2024-10-05 19:47:12,027 - INFO - Stop polling...
+2024-10-05 19:47:12,027 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002D501A48CD0>
+2024-10-05 19:47:13,299 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:47:13,316 - INFO - Start polling.
+2024-10-05 19:47:34,672 - WARNING - Polling is stopped.
+2024-10-05 19:47:34,719 - INFO - Stop polling...
+2024-10-05 19:47:34,719 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000020B2D448C10>
+2024-10-05 19:47:34,719 - ERROR - Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x0000020B2D3E2C20>, 36255.531)]']
+connector: <aiohttp.connector.TCPConnector object at 0x0000020B2D448B20>
+2024-10-05 19:47:34,719 - ERROR - Fatal error on SSL transport
+protocol: <asyncio.sslproto.SSLProtocol object at 0x0000020B2D449030>
+transport: <_ProactorSocketTransport fd=712 read=<_OverlappedFuture cancelled>>
+Traceback (most recent call last):
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\sslproto.py", line 690, in _process_write_backlog
+    self._transport.write(chunk)
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 365, in write
+    self._loop_writing(data=bytes(data))
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 401, in _loop_writing
+    self._write_fut = self._loop._proactor.send(self._sock, data)
+AttributeError: 'NoneType' object has no attribute 'send'
+2024-10-05 19:47:36,641 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:47:36,656 - INFO - Start polling.
+2024-10-05 19:47:54,909 - WARNING - Polling is stopped.
+2024-10-05 19:47:54,956 - INFO - Stop polling...
+2024-10-05 19:47:54,956 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002500FFE8CD0>
+2024-10-05 19:47:54,956 - ERROR - Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000002500FF82AA0>, 36277.953)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000002500FFE8BE0>
+2024-10-05 19:47:54,956 - ERROR - Fatal error on SSL transport
+protocol: <asyncio.sslproto.SSLProtocol object at 0x000002500FFE90F0>
+transport: <_ProactorSocketTransport fd=648 read=<_OverlappedFuture cancelled>>
+Traceback (most recent call last):
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\sslproto.py", line 690, in _process_write_backlog
+    self._transport.write(chunk)
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 365, in write
+    self._loop_writing(data=bytes(data))
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 401, in _loop_writing
+    self._write_fut = self._loop._proactor.send(self._sock, data)
+AttributeError: 'NoneType' object has no attribute 'send'
+2024-10-05 19:47:56,237 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:47:56,252 - INFO - Start polling.
+2024-10-05 19:49:59,880 - WARNING - Polling is stopped.
+2024-10-05 19:49:59,917 - INFO - Stop polling...
+2024-10-05 19:49:59,917 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001619CE78C40>
+2024-10-05 19:50:01,329 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:50:01,344 - INFO - Start polling.
+2024-10-05 19:50:08,953 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-05 19:50:08,975 - INFO - Start polling.
