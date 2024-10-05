@@ -1,9 +1,12 @@
 import json
 from utils import *
 from aiogram import Dispatcher, types
+import aiohttp
 from aiogram.types import Message, CallbackQuery
 from AntiMat import filter_text
 from ruSpamLib import is_spam
+import platform
+from keyboard_utils import settings_keyboard
 from aiogram.types import Message, InputFile
 from io import BytesIO
 from aiogram import Dispatcher, types
@@ -11,6 +14,14 @@ from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import psutil
 from ping3 import ping
 from keyboard_utils import get_ban_keyboard
+import logging
+from logging.handlers import RotatingFileHandler
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+logger = logging.getLogger()
+file_handler = RotatingFileHandler('bot_actions.log', maxBytes=1024*1024, backupCount=5)
+file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+logger.addHandler(file_handler)
 
 storage = MemoryStorage()
 
@@ -35,6 +46,17 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                 chat_id = message.chat.id
                 await message.reply(f"⚠️ Внимание! Пользователь с ID {new_member.id} присоединился к группе. Это потенциальный спаммер из нашей базы данных!")
 
+    @dp.message_handler(commands=['send_logs'])
+    async def send_logs_command(message: Message):
+        user_id = message.from_user.id
+        if user_id in SPECIAL_USER_IDS:
+            with open('bot_actions.log', 'rb') as file:
+                await message.reply_document(InputFile(file, filename='bot_actions.log'))
+            logger.info(f"Файл логов отправлен пользователю с ID {user_id}")
+        else:
+            await message.reply("Только администратор может получить файл логов.")
+            
+
     @dp.message_handler(commands=['dump_data'])
     async def dump_data_command(message: Message):
         user_id = message.from_user.id
@@ -46,7 +68,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             "log_channels": load_data(LOG_CHANNELS_DB),
             "thresholds": load_data(THRESHOLDS_DB),
             "user_messages": load_data(USER_MESSAGES_DB),
-            "banned_messages": load_data(BANNED_MESSAGES_DB),
             "chat_settings": load_data(CHAT_SETTINGS_DB)
         }
 
@@ -99,33 +120,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         )
         await message.reply(info_text, parse_mode='html', reply_markup=settings_keyboard(chat_id))
 
-    def settings_keyboard(chat_id):
-        chat_settings = load_chat_settings().get(str(chat_id), {})
-        keyboard = types.InlineKeyboardMarkup()
-        keyboard.add(
-            types.InlineKeyboardButton(
-                text=f"🔒 Забанить: {'✅' if chat_settings.get('ban', False) else '❌'}",
-                callback_data='toggle_ban_user'
-            ),
-            types.InlineKeyboardButton(
-                text=f"🔇 Замутить: {'✅' if chat_settings.get('mute', False) else '❌'}",
-                callback_data='toggle_mute_user'
-            ),
-            types.InlineKeyboardButton(
-                text=f"📩 Уведомления: {'✅' if chat_settings.get('notification', False) else '❌'}",
-                callback_data='toggle_notify_admin'
-            ),
-            types.InlineKeyboardButton(
-                text=f"🗑 Удалить сообщения: {'✅' if chat_settings.get('delete_message', False) else '❌'}",
-                callback_data='toggle_delete_message'
-            ),
-            types.InlineKeyboardButton(
-                text=f"🗑 Удалить нецензурную лексику: {'✅' if chat_settings.get('deletemat', False) else '❌'}",
-                callback_data='toggle_deletemat'  
-            )
-        )
-        return keyboard
-
     @dp.message_handler(commands=['help'])
     async def process_help_command(message: Message):
         await message.answer(help_text, parse_mode='html')
@@ -171,26 +165,85 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                             f"Количество сообщений: {message_count} 💬\n"
                             f"Ранг: {rank}")
 
-    @dp.message_handler(commands=['ping'])
+    @dp.message_handler(commands=['status'])
     async def ping_handler(message: types.Message):
-        ping_result = ping('google.com')
-        ping_time = f"{ping_result * 1000:.2f} мс" if ping_result is not None else "Ошибка пинга"
+        google_ping_result = ping('google.com')
+        telegram_ping_result = ping('149.154.167.40')
+        
+        google_ping_time = f"{google_ping_result * 1000:.2f} мс" if google_ping_result is not None else "Ошибка пинга"
+        telegram_ping_time = f"{telegram_ping_result * 1000:.2f} мс" if telegram_ping_result is not None else "Ошибка пинга"
 
         cpu_usage = psutil.cpu_percent()
         memory_info = psutil.virtual_memory()
         disk_info = psutil.disk_usage('/')
+        
+        system_info = platform.uname()
+        python_version = platform.python_version()
+        num_cores = psutil.cpu_count(logical=True)
+        uptime = os.popen('uptime -p').read().strip()
 
         response = (
-            f"**Статус сервера:**\n"
-            f"- **Пинг:** {ping_time} мс 🕒\n"
-            f"- **Загрузка CPU:** {cpu_usage}% 🖥️\n"
-            f"- **Использование памяти:** {memory_info.percent}% из {memory_info.total // (1024 ** 2)} МБ 🧠\n"
-            f"- **Использование диска:** {disk_info.percent}% из {disk_info.total // (1024 ** 3)} ГБ 💾\n"
-            f"- **Доступная память:** {memory_info.available // (1024 ** 2)} МБ 📦\n"
-            f"- **Доступное место на диске:** {disk_info.free // (1024 ** 3)} ГБ 🗄️"
+            f"Статус сервера:\n"
+            f"- Пинг до Google: {google_ping_time} 🕒\n"
+            f"- Пинг до Telegram: {telegram_ping_time} 🕒\n"
+            f"- Загрузка CPU: {cpu_usage}% 🖥️\n"
+            f"- Использование памяти: {memory_info.percent}% из {memory_info.total // (1024 ** 2)} МБ 🧠\n"
+            f"- Использование диска: {disk_info.percent}% из {disk_info.total // (1024 ** 3)} ГБ 💾\n"
+            f"- Доступная память: {memory_info.available // (1024 ** 2)} МБ 📦\n"
+            f"- Доступное место на диске: {disk_info.free // (1024 ** 3)} ГБ 🗄️\n"
+            f"- Система: {system_info.system} {system_info.release} ({system_info.machine})\n"
+            f"- Python версия: {python_version} 🐍\n"
+            f"- Количество ядер CPU: {num_cores} 🖥️\n"
+            f"- Время работы сервера: {uptime} ⏱️"
         )
+        
         await message.reply(response, parse_mode='Markdown')
 
+    @dp.message_handler(commands=['checkban'])
+    async def check_ban_command(message: Message):
+        args = message.get_args()
+
+        if not args:
+            await message.reply("Пожалуйста, укажите идентификатор пользователя после команды.")
+            return
+
+        user_id_to_check = args.strip()
+
+        try:
+            user_id_to_check_int = int(user_id_to_check)
+        except ValueError:
+            await message.reply("Идентификатор пользователя должен быть числом.")
+            return
+
+        if user_id_to_check_int in banlist:
+            await message.reply(f"❌ Пользователь с ID {user_id_to_check} находится в списке спамеров!.")
+        else:
+            await message.reply(f"✅ Пользователь с ID {user_id_to_check} не находится в списке спамеров.")
+
+
+    @dp.message_handler(commands=['updatebanlist'])
+    async def update_banlist_command(message: Message):
+        user_id = message.from_user.id
+
+        if user_id not in SPECIAL_USER_IDS:
+            await message.reply("Только владелец бота может обновить список банов.")
+            return
+
+        try:
+            async with aiohttp.ClientSession() as session:
+                async with session.get('https://lols.bot/spam/banlist.json') as resp:
+                    if resp.status == 200:
+                        banlist_data = await resp.json()
+                        with open(BANLIST_DB, 'w') as f:
+                            json.dump(banlist_data, f)
+                        await message.reply("Список банов успешно обновлен.")
+                        print("Процесс обновления списка банов завершен.")
+                    else:
+                        await message.reply("Не удалось получить список банов. Проверьте URL-адрес.")
+        except aiohttp.ClientError as e:
+            await message.reply("Произошла ошибка при обновлении списка банов.")
+            print(f"Ошибка при обновлении списка банов: {e}")
+            
     @dp.message_handler(commands=['setthreshold'])
     async def process_setthreshold_command(message: Message):
         await is_group(message)

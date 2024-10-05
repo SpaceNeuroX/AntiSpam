@@ -1,5 +1,12 @@
 import re
 
+char_map = {
+    'a': 'а', 'e': 'е', 'o': 'о', 'c': 'с', 'p': 'р', 'x': 'х', 'y': 'у', 'A': 'А', 'E': 'Е', 'O': 'О', 'C': 'С', 'P': 'Р', 'X': 'Х', 'Y': 'У'
+}
+
+def replace_latin_to_cyrillic(text):
+    return ''.join([char_map.get(c, c) for c in text])
+
 pattern = r'''(?iux)(?<![а-яё])(?:
 (?:(?:у|[нз]а|(?:хитро|не)?вз?[ыьъ]|с[ьъ]|(?:и|ра)[зс]ъ?|(?:о[тб]|п[оа]д)[ьъ]?|(?:\S(?=[а-яё]))+?[оаеи-])-?)?(?:
   [её](?:б(?!о[рй]|рач)|п[уа](?:ц|тс))|
@@ -33,6 +40,6 @@ pattern = r'''(?iux)(?<![а-яё])(?:
 (?:[нз]а|по)х
 )(?![а-яё])'''
 
-
 def filter_text(text):
+    text = replace_latin_to_cyrillic(text)
     return re.sub(pattern, "*", text)

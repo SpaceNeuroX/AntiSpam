@@ -1,3 +1,5 @@
+import subprocess
+import os
 import os
 import json
 
@@ -5,9 +7,8 @@ LOG_CHANNELS_DB = "./log_channels.json"
 THRESHOLDS_DB = "./thresholds.json"
 USER_MESSAGES_DB = "./user_messages.json"
 WRONG_MESSAGES = "./wrong_messages.json"
-BANNED_MESSAGES_DB = "./banned_messages.json"
 CHAT_SETTINGS_DB = "./chat_settings.json"
-BANLIST_DB = ".banlistDB/banlist.json"
+BANLIST_DB = "./banlistDB/banlist.json"
 
 SPECIAL_USER_IDS = [7264930816]
 
@@ -24,10 +25,8 @@ def save_data(db_file, data):
 log_channels = load_data(LOG_CHANNELS_DB)
 thresholds = load_data(THRESHOLDS_DB)
 user_messages = load_data(USER_MESSAGES_DB)
-banned_messages = load_data(BANNED_MESSAGES_DB)
 chat_settings_data = load_data(CHAT_SETTINGS_DB)
 banlist = load_data(BANLIST_DB)
-
 
 def load_chat_settings():
     return chat_settings_data
