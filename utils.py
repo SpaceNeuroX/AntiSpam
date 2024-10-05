@@ -3,7 +3,6 @@ import os
 import os
 import json
 
-LOG_CHANNELS_DB = "./log_channels.json"
 THRESHOLDS_DB = "./thresholds.json"
 USER_MESSAGES_DB = "./user_messages.json"
 WRONG_MESSAGES = "./wrong_messages.json"
@@ -22,7 +21,6 @@ def save_data(db_file, data):
     with open(db_file, "w") as file:
         json.dump(data, file, ensure_ascii=False, indent=4)
 
-log_channels = load_data(LOG_CHANNELS_DB)
 thresholds = load_data(THRESHOLDS_DB)
 user_messages = load_data(USER_MESSAGES_DB)
 chat_settings_data = load_data(CHAT_SETTINGS_DB)
@@ -40,8 +38,7 @@ async def initialize_chat_settings(chat_id):
             'mute': False,
             'delete_message': True,
             'ban': False,
-            'notification': True,
-            'deletemat': False
+            'notification': True
         }
         chat_settings_data = load_chat_settings()
         chat_settings_data[str(chat_id)] = chat_settings

@@ -19,7 +19,7 @@ from aiogram import Bot, Dispatcher
 from handlers import setup_handlers
 from text_content import get_start_text, get_help_text
 
-API_TOKEN = "8097084613:AAF9fLbWRJAI6-sh3YtDautPNrd8Sy-_oQk"
+API_TOKEN = "8097084613:AAGxYLXG_61mQLuQfnSKjZBel-DC7yu5Bqo"
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)

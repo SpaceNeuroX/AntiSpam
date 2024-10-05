@@ -3,9 +3,9 @@ from utils import *
 from aiogram import Dispatcher, types
 import aiohttp
 from aiogram.types import Message, CallbackQuery
-from AntiMat import filter_text
 from ruSpamLib import is_spam
 import platform
+import sys
 from keyboard_utils import settings_keyboard
 from aiogram.types import Message, InputFile
 from io import BytesIO
@@ -17,12 +17,27 @@ from keyboard_utils import get_ban_keyboard
 import logging
 from logging.handlers import RotatingFileHandler
 
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 logger = logging.getLogger()
-file_handler = RotatingFileHandler('bot_actions.log', maxBytes=1024*1024, backupCount=5)
-file_handler.setFormatter(logging.Formatter('%(asctime)s - %(levelname)s - %(message)s'))
+logger.setLevel(logging.INFO)
+
+# Formatter for both file and console logs
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+
+# RotatingFileHandler (logs to a file with a size limit and backup count)
+file_handler = RotatingFileHandler('bot_actions.log', maxBytes=1024*1024, backupCount=5, encoding='utf-8')
+file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
+# StreamHandler (logs to console)
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setFormatter(formatter)
+logger.addHandler(console_handler)
+
+# Ensure console output uses UTF-8 encoding
+sys.stdout.reconfigure(encoding='utf-8')
+
+# Example log message
+logger.info("Logging configured successfully with UTF-8 support!")
 storage = MemoryStorage()
 
 async def has_permission(message: types.Message) -> bool:
@@ -65,7 +80,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             return
 
         data = {
-            "log_channels": load_data(LOG_CHANNELS_DB),
             "thresholds": load_data(THRESHOLDS_DB),
             "user_messages": load_data(USER_MESSAGES_DB),
             "chat_settings": load_data(CHAT_SETTINGS_DB)
@@ -93,7 +107,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             await message.reply("Только администратор или пользователь с особыми правами может получить эту информацию.")
             return
 
-        log_channel_id = log_channels.get(str(chat_id), "Не установлено")
         threshold = thresholds.get(str(chat_id), 10)
 
         chat_settings = load_chat_settings().get(str(chat_id), {})
@@ -103,11 +116,9 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         delete_message_status = "Включено" if chat_settings.get('delete_message', False) else "Выключено"
         ban_status = "Включено" if chat_settings.get('ban', False) else "Выключено"
         notification_status = "Включено" if chat_settings.get('notification', False) else "Выключено"
-        matdelete = "Включено" if chat_settings.get('deletemat', False) else "Выключено"
 
         info_text = (
             f"<b>Настройки для группы:</b> {message.chat.title}\n\n"
-            f"<b>Канал логов:</b> {log_channel_id} 📡\n"
             f"<b>Порог сообщений:</b> {threshold} ✉️\n\n"
             f"<b>Настройки действий:</b>\n"
             f"Подписка на уведомления: {subscribe_status} 🔔\n"
@@ -115,7 +126,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             f"Удалить сообщения: {delete_message_status} 🗑️\n"
             f"Забанить пользователей: {ban_status} 🚫\n"
             f"Уведомления: {notification_status} 📢\n"
-            f"Удалить нецензурную лексику: {matdelete} 📢\n\n"
             f"<i>Первая версия: Lost Samurai 0.4</i>"
         )
         await message.reply(info_text, parse_mode='html', reply_markup=settings_keyboard(chat_id))
@@ -123,25 +133,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
     @dp.message_handler(commands=['help'])
     async def process_help_command(message: Message):
         await message.answer(help_text, parse_mode='html')
-
-    @dp.message_handler(commands=['setlog'])
-    async def process_setlog_command(message: Message):
-        await is_group(message)
-        if not await has_permission(message):
-            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
-            await message.reply("Только администратор или пользователь с особыми правами может установить канал логов.")
-            return
-
-        chat_id = message.chat.id
-        parts = message.text.split()
-        if len(parts) != 2:
-            await message.reply("Использование: /setlog <id_канала>")
-            return
-
-        log_channel_id = parts[1]
-        log_channels[str(chat_id)] = log_channel_id
-        save_data(LOG_CHANNELS_DB, log_channels)
-        await message.reply(f"Канал логов успешно установлен: {log_channel_id}")
 
     @dp.message_handler(commands=['me'])
     async def process_me_command(message: Message):
@@ -270,15 +261,12 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
     async def handle_prof_command(message: types.Message):
         argument = message.get_args()
         if argument:
-            if '**' in filter_text(argument):
-                await message.reply('❌ Обнаружена нецензурная лексика в тексте!')
-            else:
-                is_spam_result, confidence = is_spam(message=message.text, model_name="spamNS_v6", multi_model=False)
-                if is_spam_result:
-                    await message.reply(f'❌ Обнаружена реклама! Уверенность: {confidence:.2f}')
+            is_spam_result, confidence = is_spam(message=message.text, model_name="spamNS_v6", multi_model=False)
+            if is_spam_result:
+                await message.reply(f'❌ Обнаружена реклама! Уверенность: {confidence:.2f}')
 
-                else:
-                    await message.reply('✅ Текст не содержит нецензурной лексики или рекламы.')
+            else:
+                await message.reply('✅ Текст не содержит рекламы.')
         else:
             await message.reply('❌ Пожалуйста, введите текст для проверки.')
 
@@ -306,16 +294,9 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                     save_data(BANLIST_DB, banlist)
 
                 await bot.ban_chat_member(chat_id=target_chat_id, user_id=target_user_id)
-                message_text = callback_query.message.text or "Сообщение было удалено или недоступно"
-                ban_message = f"✅ Пользователь {target_user_id} забанен\n\n"
-                ban_message += f"Забанил: {callback_query.from_user.full_name} (@{callback_query.from_user.username})\n"
-                ban_message += f"{message_text}"
-                await bot.edit_message_text(
-                    text=ban_message,
-                    chat_id=chat_id,
-                    message_id=callback_query.message.message_id
-                )
-                await bot.answer_callback_query(callback_query.id, text="Пользователь успешно забанен")
+                
+                await bot.delete_message(chat_id=chat_id, message_id=callback_query.message.message_id)
+                await bot.answer_callback_query(callback_query.id, text="✅ Пользователь успешно забанен!", show_alert=True)
 
             except Exception as e:
                 await bot.answer_callback_query(callback_query.id,
@@ -352,17 +333,24 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             await bot.answer_callback_query(callback_query.id, text=f"Настройка '{setting}' изменена на {'✅' if not current_value else '❌'}", show_alert=True)
 
         elif data.startswith("incorrect_"):
-            with open(WRONG_MESSAGES, 'r') as file:
+            target_user_id, target_chat_id = map(int, data.split('_')[1:])
+            chat_member = await bot.get_chat_member(chat_id=target_chat_id, user_id=target_user_id)
+            if chat_member.status not in ['administrator', 'creator']:
+                await bot.answer_callback_query(
+                    callback_query.id,
+                    text="Только админ может пометить сообщение!"
+                )
+                return
+            
+            with open(WRONG_MESSAGES, 'r', encoding='utf-8') as file:
                 wrong_messages = json.load(file)
 
             wrong_messages.append({"user_id": user_id, "chat_id": chat_id, "message": callback_query.message.text})
 
-            with open(WRONG_MESSAGES, 'w') as file:
+            with open(WRONG_MESSAGES, 'w', encoding='utf-8') as file:
                 json.dump(wrong_messages, file, ensure_ascii=False, indent=4)
 
-            await bot.send_message(chat_id=-1002348384690, text=f"Неправильно определённое сообщение:\n\n{callback_query.message.text}")
-            await bot.edit_message_text(text="Спасибо за обратную связь! Это поможет нам улучшить наши модели!",
-                                        chat_id=chat_id, message_id=callback_query.message.message_id)
+            await bot.delete_message(chat_id=chat_id, message_id=callback_query.message.message_id)
             
     
     @dp.message_handler()
@@ -383,13 +371,17 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
         pred_average, confidence = is_spam(message.text, model_name="spamNS_v6")
         
-        filtered_message_text = filter_text(message.text)
-
-        if (pred_average and user_messages[str(chat_id)][str(user_id)] < threshold) or (message.text != filtered_message_text and chat_settings.get('deletemat', False)):
-            
+        if pred_average and user_messages[str(chat_id)][str(user_id)] < threshold:
+            keyboard = get_ban_keyboard(message.from_user.id, message.chat.id)
 
             if chat_settings.get('delete_message', True):
                 await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+                await bot.send_message(
+                    chat_id,
+                    f"Сообщение от @{message.from_user.username} удалено в {message.chat.title}:\n\n<tg-spoiler>{message.text}, вероятность модели: {confidence}</tg-spoiler>",
+                    parse_mode="HTML",
+                    reply_markup=keyboard
+                )
 
             if chat_settings.get('ban', False) and pred_average:
                 if has_permission(message):
@@ -405,22 +397,4 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                 
                 await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id, can_send_messages=False)
 
-            if chat_settings.get('notification', True):
-                log_channel_id = log_channels.get(str(message.chat.id))
-
-                if log_channel_id:
-                    keyboard = get_ban_keyboard(message.from_user.id, message.chat.id)
-                    await bot.send_message(
-                        log_channel_id,
-                        f"Сообщение от @{message.from_user.username} удалено в {message.chat.title}:\n\n{filtered_message_text}, вероятность модели: {confidence}",
-                        reply_markup=keyboard
-                    )
-                    if pred_average:
-                        message_text = f"💬 Сообщение удалено за рекламу от @{message.from_user.username or message.from_user.id}! 🚫 Вероятность: {confidence}"
-                    else:
-                        message_text = f"💬 Сообщение удалено за нецензурную лексику от @{message.from_user.username or message.from_user.id}!"
-
-                    await bot.send_message(
-                        chat_id,
-                        message_text
-                    )
+                    
