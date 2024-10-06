@@ -155,14 +155,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
     @dp.message_handler(commands=['status'])
     async def ping_handler(message: types.Message):
-        # Установка библиотеки battery, если она не установлена
-        try:
-            import battery
-        except ImportError:
-            await message.reply("Библиотека 'battery' не найдена. Устанавливаю...")
-            subprocess.check_call([sys.executable, "-m", "pip", "install", "battery"])
-            import battery
-
         google_ping_result = ping('google.com')
         telegram_ping_result = ping('149.154.167.40')
         
@@ -179,11 +171,17 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         uptime = os.popen('uptime -p').read().strip()
 
         # Получаем информацию о батарее
-        battery_instance = battery.Battery()  # Создаем экземпляр Battery
-        battery_status = battery_instance.percent  # Процент заряда
-        battery_power_plugged = "Да" if battery_instance.power_plugged else "Нет"  # Статус зарядки
-        battery_consumption = f"{battery_instance.current_consumption:.2f} Вт" if battery_instance.power_plugged else f"{battery_instance.current_consumption:.2f} Вт (разрядка)"
+        battery = psutil.sensors_battery()
         
+        if battery is not None:
+            battery_status = battery.percent  # Процент заряда
+            battery_power_plugged = "Да" if battery.power_plugged else "Нет"  # Статус зарядки
+            battery_consumption = "N/A"  # Потребление энергии не поддерживается в psutil
+        else:
+            battery_status = "Нет информации о батарее"
+            battery_power_plugged = "N/A"
+            battery_consumption = "N/A"
+
         response = (
             f"Статус сервера:\n"
             f"- Пинг до Google: {google_ping_time} 🕒\n"
@@ -198,11 +196,11 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             f"- Количество ядер CPU: {num_cores} 🖥️\n"
             f"- Время работы сервера: {uptime} ⏱️\n"
             f"- Заряд батареи: {battery_status}% 🔋\n"
-            f"- Потребляемая мощность: {battery_consumption}\n"
             f"- Зарядка: {battery_power_plugged} 🔌"
         )
         
         await message.reply(response, parse_mode='Markdown')
+
     
     @dp.message_handler(commands=['checkban'])
     async def check_ban_command(message: Message):
