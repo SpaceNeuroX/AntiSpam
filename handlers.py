@@ -298,6 +298,12 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
         if data.startswith('ban_'):
             target_user_id, target_chat_id = map(int, data.split('_')[1:])
+            if chat_member.status not in ['administrator', 'creator']:
+                await bot.answer_callback_query(
+                    callback_query.id,
+                    text="Только админ может забанить!"
+                )
+                return
             try:
                 chat_member = await bot.get_chat_member(chat_id=target_chat_id, user_id=target_user_id)
                 if chat_member.status in ['administrator', 'creator']:
