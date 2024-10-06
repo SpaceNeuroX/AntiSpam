@@ -290,6 +290,10 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
     async def process_update_bot_command(message: Message):
         await update_bot_command(message)
 
+    @dp.message_handler(commands=['restart_bot'])
+    async def process_update_bot_command(message: Message):
+        await restart_bot(message)
+
     @dp.callback_query_handler()
     async def process_callback_query(callback_query: CallbackQuery):
         data = callback_query.data

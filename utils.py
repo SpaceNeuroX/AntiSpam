@@ -2,6 +2,7 @@ import subprocess
 import os
 from aiogram.types import Message
 import json
+import asyncio
 import subprocess
 import shutil
 import sys
@@ -81,28 +82,51 @@ async def update_bot_command(message: Message):
 
         repo_url = f'https://{git_token}@github.com/SpaceNeuroX/AntiSpam.git'
 
-        await message.reply("Клонирование репозитория...")
+        status_msg = await message.reply("Клонирование репозитория... [0%]")
+        
         subprocess.run(['git', 'clone', repo_url, temp_dir], check=True)
+        await status_msg.edit_text("Клонирование репозитория... [30%]")
 
-        await message.reply("Удаление старых файлов...")
+        await asyncio.sleep(1)
+        await status_msg.edit_text("Удаление старых файлов... [50%]")
         for file in os.listdir('.'):
             if file.endswith('.py'):
                 os.remove(file)
 
-        await message.reply("Копирование новых файлов...")
+        await asyncio.sleep(1)
+        await status_msg.edit_text("Копирование новых файлов... [70%]")
         for file in os.listdir(temp_dir):
             if file.endswith('.py'):
                 shutil.copy(os.path.join(temp_dir, file), '.')
 
+        await asyncio.sleep(1)
+        await status_msg.edit_text("Удаление временных файлов... [90%]")
         shutil.rmtree(temp_dir, ignore_errors=True)
 
-        await message.reply("Перезапуск бота...")
+        await asyncio.sleep(1)
+        await status_msg.edit_text("Перезапуск бота... [100%]")
 
         subprocess.Popen([sys.executable, 'main_bot.py'])
         os._exit(0)
 
     except subprocess.CalledProcessError as e:
-        await message.reply(f"Произошла ошибка при обновлении бота: {e}")
+        await status_msg.edit_text(f"Произошла ошибка при обновлении бота: {e}")
     except Exception as e:
-        await message.reply(f"Произошла неизвестная ошибка: {e}")
+        await status_msg.edit_text(f"Произошла неизвестная ошибка: {e}")
 
+async def restart_bot(message):
+    user_id = message.from_user.id
+
+    if user_id not in SPECIAL_USER_IDS:
+        await message.reply("Только владелец бота может перезапустить бота.")
+        return
+
+    try:
+        await message.reply("Перезапуск бота...")
+
+        subprocess.Popen([sys.executable, 'main_bot.py'])
+        
+        os._exit(0)
+        
+    except Exception as e:
+        await message.reply(f"Ошибка при перезапуске: {e}")
