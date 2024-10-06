@@ -16,7 +16,6 @@ import psutil
 from ping3 import ping
 from keyboard_utils import get_ban_keyboard
 import logging
-from filters import IsAdminFilter
 from logging.handlers import RotatingFileHandler
 
 logger = logging.getLogger()

@@ -1,33 +1,25 @@
-# This code sets up handlers for a Telegram bot using the aiogram library.
-# It includes handlers for various commands and message processing.
-#
-# Author: @NeuroSpaceX
-#
-# Libraries used:
-# - aiogram: Library for building Telegram bots.
-# - AntiMat: Module for filtering text (possibly for profanity).
-# - ruSpamLib: Library for spam detection. Developed by @NeuroSpaceX.
-#   This library is licensed under a non-commercial use license.
-#   You are allowed to use it only for non-commercial purposes and must credit the author.
-# - keyboard_utils: Module containing functions to generate keyboards.
-# License:
-# This code is licensed under a non-commercial use license.
-# You are allowed to use it only for non-commercial purposes and must credit the author @NeuroSpaceX.
-		
 import asyncio
-from aiogram import Bot, Dispatcher
+from aiogram import Bot, Dispatcher, types
+from aiogram.dispatcher import filters
 from handlers import setup_handlers
 from text_content import get_start_text, get_help_text
-from filters import IsAdminFilter
 
 API_TOKEN = "8097084613:AAHxNR0Xa2BE6BxGoqhe5C477pNel4APv-8"
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
+class IsAdminFilter(filters.BoundFilter):
+    key = 'is_admin'
 
-dp.filters_factory.bind(IsAdminFilter, bot=bot)
+    def __init__(self, is_admin: bool):
+        self.is_admin = is_admin
 
+    async def check(self, message: types.Message):
+        chat_member = await bot.get_chat_member(message.chat.id, message.from_user.id)
+        return chat_member.status in ["creator", "administrator"] if self.is_admin else chat_member.status not in ["creator", "administrator"]
+
+dp.filters_factory.bind(IsAdminFilter)
 
 start_text = get_start_text()
 help_text = get_help_text()
