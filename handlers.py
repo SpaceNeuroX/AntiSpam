@@ -9,6 +9,7 @@ import sys
 from keyboard_utils import settings_keyboard
 from aiogram.types import Message, InputFile
 from io import BytesIO
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram import Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import psutil
@@ -197,9 +198,13 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             f"- Заряд батареи: {battery_status}% 🔋\n"
             f"- Зарядка: {battery_power_plugged} 🔌"
         )
-        
-        await message.reply(response, parse_mode='Markdown')
 
+        # Добавление кнопки для перезапуска
+        keyboard = InlineKeyboardMarkup()
+        restart_button = InlineKeyboardButton(text="Перезапустить сервер", callback_data="restart_server")
+        keyboard.add(restart_button)
+
+        await message.reply(response, parse_mode='Markdown', reply_markup=keyboard)
     
     @dp.message_handler(commands=['checkban'])
     async def check_ban_command(message: Message):
@@ -365,6 +370,11 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                 json.dump(wrong_messages, file, ensure_ascii=False, indent=4)
 
             await bot.delete_message(chat_id=chat_id, message_id=callback_query.message.message_id)
+        elif data.startswith("restart_server"):
+            await bot.answer_callback_query(callback_query.id)
+            await callback_query.message.answer("Перезапускаю сервер...")
+
+            os.system("sudo reboot")
             
     
     @dp.message_handler()
