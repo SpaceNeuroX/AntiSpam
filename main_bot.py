@@ -18,11 +18,16 @@ import asyncio
 from aiogram import Bot, Dispatcher
 from handlers import setup_handlers
 from text_content import get_start_text, get_help_text
+from filters import IsAdminFilter
 
 API_TOKEN = "8097084613:AAHxNR0Xa2BE6BxGoqhe5C477pNel4APv-8"
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
+
+
+dp.filters_factory.bind(IsAdminFilter, bot=bot)
+
 
 start_text = get_start_text()
 help_text = get_help_text()

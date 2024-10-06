@@ -48,8 +48,6 @@ async def initialize_chat_settings(chat_id):
         chat_settings_data[str(chat_id)] = chat_settings
         save_chat_settings(chat_settings_data)
 
-
-
 def get_user_rank(message_count):
     if message_count < 100:
         return "Новичок 🌱"

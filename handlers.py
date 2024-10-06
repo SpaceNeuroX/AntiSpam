@@ -16,6 +16,7 @@ import psutil
 from ping3 import ping
 from keyboard_utils import get_ban_keyboard
 import logging
+from filters import IsAdminFilter
 from logging.handlers import RotatingFileHandler
 
 logger = logging.getLogger()
@@ -285,6 +286,20 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                 await message.reply('✅ Текст не содержит рекламы.')
         else:
             await message.reply('❌ Пожалуйста, введите текст для проверки.')
+
+    @dp.message_handler(commands=['ban'], is_admin=True)
+    async def ban_user(message: types.Message):
+        if not message.reply_to_message:
+            await message.reply("Команда должна быть ответом на сообщение.")
+            return
+        
+        user_to_ban = message.reply_to_message.from_user
+
+        try:
+            await message.chat.kick(user_to_ban.id)
+            await message.reply(f"Пользователь {user_to_ban.full_name} был забанен.")
+        except Exception as e:
+            await message.reply(f"Не удалось забанить пользователя. Ошибка: {e}")
 
     @dp.message_handler(commands=['update_bot'])
     async def process_update_bot_command(message: Message):
