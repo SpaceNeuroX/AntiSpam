@@ -3,9 +3,6 @@ import os
 from aiogram.types import Message
 import json
 import subprocess
-from handlers import has_permission, bot
-from ruSpamLib import is_spam
-from keyboard_utils import get_ban_keyboard
 import shutil
 import sys
 
@@ -109,59 +106,3 @@ async def update_bot_command(message: Message):
     except Exception as e:
         await message.reply(f"Произошла неизвестная ошибка: {e}")
 
-async def handle_message(message: Message, edited=False, original_text=None):
-    pred_average = False
-    chat_id = message.chat.id
-    user_id = message.from_user.id
-    threshold = thresholds.get(str(chat_id), 10)
-
-    if str(chat_id) not in user_messages:
-        user_messages[str(chat_id)] = {}
-    if str(user_id) not in user_messages[str(chat_id)]:
-        user_messages[str(chat_id)][str(user_id)] = 0
-    user_messages[str(chat_id)][str(user_id)] += 1
-    save_data(USER_MESSAGES_DB, user_messages)
-
-    chat_settings = load_chat_settings().get(str(chat_id), {})
-
-    pred_average, confidence = is_spam(message.text, model_name="spamNS_v6")
-
-    if pred_average and user_messages[str(chat_id)][str(user_id)] < threshold:
-        keyboard = get_ban_keyboard(message.from_user.id, message.chat.id)
-
-        if chat_settings.get('delete_message', True):
-            await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-            confidence_percent = int(confidence * 100)
-            
-            if edited and original_text:
-                await bot.send_message(
-                    chat_id,
-                    f"Изменённое сообщение от @{message.from_user.username} было удалено в {message.chat.title}:\n\n"
-                    f"Оригинальное сообщение: <tg-spoiler>{original_text}</tg-spoiler>\n"
-                    f"Изменённое сообщение: <tg-spoiler>{message.text}</tg-spoiler>\n"
-                    f"Вероятность спама: {confidence_percent}%",
-                    parse_mode="HTML",
-                    reply_markup=keyboard
-                )
-            else:
-                await bot.send_message(
-                    chat_id,
-                    f"Сообщение от @{message.from_user.username} удалено в {message.chat.title}:\n\n"
-                    f"<tg-spoiler>{message.text}, вероятность модели: {confidence_percent}%</tg-spoiler>",
-                    parse_mode="HTML",
-                    reply_markup=keyboard
-                )
-
-        if chat_settings.get('ban', False) and pred_average:
-            if has_permission(message):
-                await bot.send_message(chat_id, "Нельзя забанить администратора!")
-                return
-
-            await bot.ban_chat_member(chat_id=message.chat.id, user_id=message.from_user.id)
-
-        if chat_settings.get('mute', False) and pred_average:
-            if has_permission(message):
-                await bot.send_message(chat_id, "Нельзя замутить администратора!")
-                return
-
-            await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id, can_send_messages=False)
