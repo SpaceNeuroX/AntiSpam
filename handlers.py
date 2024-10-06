@@ -20,6 +20,8 @@ from logging.handlers import RotatingFileHandler
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
+original_messages = {}
+
 # Formatter for both file and console logs
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
@@ -358,16 +360,18 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
     
     @dp.message_handler()
     async def process_message(message: Message):
+        # Сохраняем оригинальное сообщение в словарь
+        original_messages[message.message_id] = message.text
         await handle_message(message)
 
+    # Обработчик редактированных сообщений
     @dp.edited_message_handler()
     async def process_edited_message(message: Message):
-        # Save the original message content for later comparison
-        if not hasattr(message, 'original_text'):
-            message.original_text = message.text
-        await handle_message(message, edited=True)
+        original_text = original_messages.get(message.message_id, "Оригинальный текст не найден")
+        await handle_message(message, edited=True, original_text=original_text)
 
-    async def handle_message(message: Message, edited=False):
+    # Обработчик всех сообщений
+    async def handle_message(message: Message, edited=False, original_text=None):
         pred_average = False
         chat_id = message.chat.id
         user_id = message.from_user.id
@@ -391,19 +395,17 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                 await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
                 confidence_percent = int(confidence * 100)
                 
-                if edited:
-                    # Notify the group about the deleted edited message
+                if edited and original_text:
                     await bot.send_message(
                         chat_id,
                         f"Изменённое сообщение от @{message.from_user.username} было удалено в {message.chat.title}:\n\n"
-                        f"Оригинальное сообщение: <tg-spoiler>{message.original_text}</tg-spoiler>\n"
+                        f"Оригинальное сообщение: <tg-spoiler>{original_text}</tg-spoiler>\n"
                         f"Изменённое сообщение: <tg-spoiler>{message.text}</tg-spoiler>\n"
                         f"Вероятность спама: {confidence_percent}%",
                         parse_mode="HTML",
                         reply_markup=keyboard
                     )
                 else:
-                    # Notify the group about the deleted message
                     await bot.send_message(
                         chat_id,
                         f"Сообщение от @{message.from_user.username} удалено в {message.chat.title}:\n\n"
