@@ -22,23 +22,18 @@ logger.setLevel(logging.INFO)
 
 original_messages = {}
 
-# Formatter for both file and console logs
 formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
 
-# RotatingFileHandler (logs to a file with a size limit and backup count)
 file_handler = RotatingFileHandler('bot_actions.log', maxBytes=1024*1024, backupCount=5, encoding='utf-8')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)
 
-# StreamHandler (logs to console)
 console_handler = logging.StreamHandler(sys.stdout)
 console_handler.setFormatter(formatter)
 logger.addHandler(console_handler)
 
-# Ensure console output uses UTF-8 encoding
 sys.stdout.reconfigure(encoding='utf-8')
 
-# Example log message
 logger.info("Logging configured successfully with UTF-8 support!")
 storage = MemoryStorage()
 
@@ -160,6 +155,14 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
     @dp.message_handler(commands=['status'])
     async def ping_handler(message: types.Message):
+        # Установка библиотеки battery, если она не установлена
+        try:
+            import battery
+        except ImportError:
+            await message.reply("Библиотека 'battery' не найдена. Устанавливаю...")
+            subprocess.check_call([sys.executable, "-m", "pip", "install", "battery"])
+            import battery
+
         google_ping_result = ping('google.com')
         telegram_ping_result = ping('149.154.167.40')
         
@@ -169,12 +172,18 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         cpu_usage = psutil.cpu_percent()
         memory_info = psutil.virtual_memory()
         disk_info = psutil.disk_usage('/')
-        
+
         system_info = platform.uname()
         python_version = platform.python_version()
         num_cores = psutil.cpu_count(logical=True)
         uptime = os.popen('uptime -p').read().strip()
 
+        # Получаем информацию о батарее
+        battery_instance = battery.Battery()  # Создаем экземпляр Battery
+        battery_status = battery_instance.percent  # Процент заряда
+        battery_power_plugged = "Да" if battery_instance.power_plugged else "Нет"  # Статус зарядки
+        battery_consumption = f"{battery_instance.current_consumption:.2f} Вт" if battery_instance.power_plugged else f"{battery_instance.current_consumption:.2f} Вт (разрядка)"
+        
         response = (
             f"Статус сервера:\n"
             f"- Пинг до Google: {google_ping_time} 🕒\n"
@@ -187,7 +196,10 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             f"- Система: {system_info.system} {system_info.release} ({system_info.machine})\n"
             f"- Python версия: {python_version} 🐍\n"
             f"- Количество ядер CPU: {num_cores} 🖥️\n"
-            f"- Время работы сервера: {uptime} ⏱️"
+            f"- Время работы сервера: {uptime} ⏱️\n"
+            f"- Заряд батареи: {battery_status}% 🔋\n"
+            f"- Потребляемая мощность: {battery_consumption}\n"
+            f"- Зарядка: {battery_power_plugged} 🔌"
         )
         
         await message.reply(response, parse_mode='Markdown')
@@ -360,70 +372,11 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
     
     @dp.message_handler()
     async def process_message(message: Message):
-        # Сохраняем оригинальное сообщение в словарь
         original_messages[message.message_id] = message.text
         await handle_message(message)
 
-    # Обработчик редактированных сообщений
     @dp.edited_message_handler()
     async def process_edited_message(message: Message):
         original_text = original_messages.get(message.message_id, "Оригинальный текст не найден")
         await handle_message(message, edited=True, original_text=original_text)
 
-    # Обработчик всех сообщений
-    async def handle_message(message: Message, edited=False, original_text=None):
-        pred_average = False
-        chat_id = message.chat.id
-        user_id = message.from_user.id
-        threshold = thresholds.get(str(chat_id), 10)
-
-        if str(chat_id) not in user_messages:
-            user_messages[str(chat_id)] = {}
-        if str(user_id) not in user_messages[str(chat_id)]:
-            user_messages[str(chat_id)][str(user_id)] = 0
-        user_messages[str(chat_id)][str(user_id)] += 1
-        save_data(USER_MESSAGES_DB, user_messages)
-
-        chat_settings = load_chat_settings().get(str(chat_id), {})
-
-        pred_average, confidence = is_spam(message.text, model_name="spamNS_v6")
-
-        if pred_average and user_messages[str(chat_id)][str(user_id)] < threshold:
-            keyboard = get_ban_keyboard(message.from_user.id, message.chat.id)
-
-            if chat_settings.get('delete_message', True):
-                await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
-                confidence_percent = int(confidence * 100)
-                
-                if edited and original_text:
-                    await bot.send_message(
-                        chat_id,
-                        f"Изменённое сообщение от @{message.from_user.username} было удалено в {message.chat.title}:\n\n"
-                        f"Оригинальное сообщение: <tg-spoiler>{original_text}</tg-spoiler>\n"
-                        f"Изменённое сообщение: <tg-spoiler>{message.text}</tg-spoiler>\n"
-                        f"Вероятность спама: {confidence_percent}%",
-                        parse_mode="HTML",
-                        reply_markup=keyboard
-                    )
-                else:
-                    await bot.send_message(
-                        chat_id,
-                        f"Сообщение от @{message.from_user.username} удалено в {message.chat.title}:\n\n"
-                        f"<tg-spoiler>{message.text}, вероятность модели: {confidence_percent}%</tg-spoiler>",
-                        parse_mode="HTML",
-                        reply_markup=keyboard
-                    )
-
-            if chat_settings.get('ban', False) and pred_average:
-                if has_permission(message):
-                    await bot.send_message(chat_id, "Нельзя забанить администратора!")
-                    return
-
-                await bot.ban_chat_member(chat_id=message.chat.id, user_id=message.from_user.id)
-
-            if chat_settings.get('mute', False) and pred_average:
-                if has_permission(message):
-                    await bot.send_message(chat_id, "Нельзя замутить администратора!")
-                    return
-
-                await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id, can_send_messages=False)
