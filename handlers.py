@@ -170,13 +170,12 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         num_cores = psutil.cpu_count(logical=True)
         uptime = os.popen('uptime -p').read().strip()
 
-        # Получаем информацию о батарее
         battery = psutil.sensors_battery()
         
         if battery is not None:
-            battery_status = battery.percent  # Процент заряда
-            battery_power_plugged = "Да" if battery.power_plugged else "Нет"  # Статус зарядки
-            battery_consumption = "N/A"  # Потребление энергии не поддерживается в psutil
+            battery_status = battery.percent  
+            battery_power_plugged = "Да" if battery.power_plugged else "Нет"
+            battery_consumption = "N/A"  
         else:
             battery_status = "Нет информации о батарее"
             battery_power_plugged = "N/A"
