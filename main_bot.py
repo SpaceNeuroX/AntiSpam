@@ -34,6 +34,7 @@ class IsOwner(filters.BoundFilter):
             return user_id not in SPECIAL_USER_IDS
 
 dp.filters_factory.bind(IsAdminFilter)
+dp.filters_factory.bind(IsOwner)
 
 start_text = get_start_text()
 help_text = get_help_text()
