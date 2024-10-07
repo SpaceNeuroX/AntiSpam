@@ -3,6 +3,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher import filters
 from handlers import setup_handlers
 from text_content import get_start_text, get_help_text
+from utils import SPECIAL_USER_IDS
 
 API_TOKEN = "8097084613:AAHxNR0Xa2BE6BxGoqhe5C477pNel4APv-8"
 
@@ -18,6 +19,19 @@ class IsAdminFilter(filters.BoundFilter):
     async def check(self, message: types.Message):
         chat_member = await bot.get_chat_member(message.chat.id, message.from_user.id)
         return chat_member.status in ["creator", "administrator"] if self.is_admin else chat_member.status not in ["creator", "administrator"]
+
+class IsOwner(filters.BoundFilter):
+    key = 'is_owner'
+
+    def __init__(self, is_owner: bool):
+        self.is_owner = is_owner
+
+    async def check(self, message: types.Message):
+        user_id = message.from_user.id
+        if self.is_owner:
+            return user_id in SPECIAL_USER_IDS 
+        else:
+            return user_id not in SPECIAL_USER_IDS
 
 dp.filters_factory.bind(IsAdminFilter)
 

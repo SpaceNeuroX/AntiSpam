@@ -59,7 +59,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                 chat_id = message.chat.id
                 await message.reply(f"⚠️ Внимание! Пользователь с ID {new_member.id} присоединился к группе. Это потенциальный спаммер из нашей базы данных!")
 
-    @dp.message_handler(commands=['send_logs'])
+    @dp.message_handler(commands=['send_logs'], is_owner = True)
     async def send_logs_command(message: Message):
         user_id = message.from_user.id
         if user_id in SPECIAL_USER_IDS:
@@ -70,7 +70,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             await message.reply("Только администратор может получить файл логов.")
             
 
-    @dp.message_handler(commands=['dump_data'])
+    @dp.message_handler(commands=['dump_data'], is_owner = True)
     async def dump_data_command(message: Message):
         user_id = message.from_user.id
         if user_id not in SPECIAL_USER_IDS:
@@ -148,7 +148,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                             f"Количество сообщений: {message_count} 💬\n"
                             f"Ранг: {rank}")
 
-    @dp.message_handler(commands=['status'])
+    @dp.message_handler(commands=['status'], is_owner = True)
     async def ping_handler(message: types.Message):
         google_ping_result = ping('google.com')
         telegram_ping_result = ping('149.154.167.40')
@@ -222,14 +222,8 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             await message.reply(f"✅ Пользователь с ID {user_id_to_check} не находится в списке спамеров.")
 
 
-    @dp.message_handler(commands=['updatebanlist'])
+    @dp.message_handler(commands=['updatebanlist'], is_owner = True)
     async def update_banlist_command(message: Message):
-        user_id = message.from_user.id
-
-        if user_id not in SPECIAL_USER_IDS:
-            await message.reply("Только владелец бота может обновить список банов.")
-            return
-
         try:
             async with aiohttp.ClientSession() as session:
                 async with session.get('https://lols.bot/spam/banlist.json') as resp:
@@ -260,7 +254,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         save_data(THRESHOLDS_DB, thresholds)
         await message.reply(f"Порог сообщений успешно установлен: {threshold}")
 
-    @dp.message_handler(commands=['prof'])
+    @dp.message_handler(commands=['prof'], is_admin = True)
     async def handle_prof_command(message: types.Message):
         argument = message.get_args()
         if argument:
@@ -290,10 +284,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
     @dp.message_handler(commands=['update_bot'])
     async def process_update_bot_command(message: Message):
         await update_bot_command(message)
-
-    @dp.message_handler(commands=['restart_bot'])
-    async def process_update_bot_command(message: Message):
-        await restart_bot(message)
 
     @dp.callback_query_handler()
     async def process_callback_query(callback_query: CallbackQuery):
@@ -384,12 +374,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                 json.dump(wrong_messages, file, ensure_ascii=False, indent=4)
 
             await bot.delete_message(chat_id=chat_id, message_id=callback_query.message.message_id)
-        elif data.startswith("restart_server"):
-            await bot.answer_callback_query(callback_query.id)
-            await callback_query.message.answer("Перезапускаю сервер...")
-
-            os.system("sudo reboot")
-            
     
     @dp.message_handler()
     async def process_message(message: Message):

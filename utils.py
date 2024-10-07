@@ -115,20 +115,3 @@ async def update_bot_command(message: Message):
         await status_msg.edit_text(f"❌ Произошла ошибка при обновлении бота: {e}")
     except Exception as e:
         await status_msg.edit_text(f"❌ Произошла неизвестная ошибка: {e}")
-
-async def restart_bot(message):
-    user_id = message.from_user.id
-
-    if user_id not in SPECIAL_USER_IDS:
-        await message.reply("Только владелец бота может перезапустить бота.")
-        return
-
-    try:
-        await message.reply("Перезапуск бота...")
-
-        subprocess.Popen([sys.executable, 'main_bot.py'])
-        
-        os._exit(0)
-        
-    except Exception as e:
-        await message.reply(f"Ошибка при перезапуске: {e}")
