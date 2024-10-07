@@ -298,11 +298,12 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
     @dp.callback_query_handler()
     async def process_callback_query(callback_query: CallbackQuery):
         data = callback_query.data
-        chat_member = await bot.get_chat_member(chat_id=target_chat_id, user_id=target_user_id)
-                
+
         user_id = callback_query.from_user.id
         chat_id = callback_query.message.chat.id
 
+        chat_member = await bot.get_chat_member(chat_id=chat_id, user_id=user_id)
+                
         if data.startswith('ban_'):
             target_user_id, target_chat_id = map(int, data.split('_')[1:])
             if chat_member.status not in ['administrator', 'creator']:
