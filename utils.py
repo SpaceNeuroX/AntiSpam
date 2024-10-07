@@ -75,7 +75,7 @@ async def update_bot_command(message: Message):
 
         git_token = os.getenv('GIT_TOKEN')
         if not git_token:
-            await message.reply("Токен GitHub не найден в переменных окружения.")
+            await message.reply("❌ Токен GitHub не найден в переменных окружения.")
             return
 
         repo_url = f'https://{git_token}@github.com/SpaceNeuroX/AntiSpam.git'
@@ -104,13 +104,17 @@ async def update_bot_command(message: Message):
         await asyncio.sleep(1)
         await status_msg.edit_text("Перезапуск бота... [100%]")
 
+        
+        await asyncio.sleep(1)
+        await status_msg.edit_text("✅ Успешно! ... [100%]")
+
         subprocess.Popen([sys.executable, 'main_bot.py'])
         os._exit(0)
 
     except subprocess.CalledProcessError as e:
-        await status_msg.edit_text(f"Произошла ошибка при обновлении бота: {e}")
+        await status_msg.edit_text(f"❌ Произошла ошибка при обновлении бота: {e}")
     except Exception as e:
-        await status_msg.edit_text(f"Произошла неизвестная ошибка: {e}")
+        await status_msg.edit_text(f"❌ Произошла неизвестная ошибка: {e}")
 
 async def restart_bot(message):
     user_id = message.from_user.id
