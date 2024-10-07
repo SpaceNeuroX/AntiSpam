@@ -96,15 +96,9 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         start_message = await message.answer(start_text, parse_mode='html')
         dp['start_message_id'] = start_message.message_id
 
-    @dp.message_handler(commands=['info'])
+    @dp.message_handler(commands=['info'], is_admin = True)
     async def process_info_command(message: Message):
         chat_id = message.chat.id
-
-        if not await has_permission(message):
-            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))        
-            await message.reply("Только администратор или пользователь с особыми правами может получить эту информацию.")
-            return
-
         threshold = thresholds.get(str(chat_id), 10)
 
         chat_settings = load_chat_settings().get(str(chat_id), {})
@@ -251,16 +245,9 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             await message.reply("Произошла ошибка при обновлении списка банов.")
             print(f"Ошибка при обновлении списка банов: {e}")
             
-    @dp.message_handler(commands=['setthreshold'])
+    @dp.message_handler(commands=['setthreshold'], is_admin = True)
     async def process_setthreshold_command(message: Message):
         await is_group(message)
-
-        if not await has_permission(message):
-            await message.reply_video(video=open('./video/reverse-flash-cw.mp4', 'rb'))
-            await message.reply(
-                "Только администратор или пользователь с особыми правами может установить порог сообщений."
-            )
-            return
 
         chat_id = message.chat.id
         parts = message.text.split()

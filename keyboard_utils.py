@@ -23,10 +23,6 @@ def settings_keyboard(chat_id):
                 callback_data='toggle_mute_user'
             ),
             types.InlineKeyboardButton(
-                text=f"📩 Уведомления: {'✅' if chat_settings.get('notification', False) else '❌'}",
-                callback_data='toggle_notify_admin'
-            ),
-            types.InlineKeyboardButton(
                 text=f"🗑 Удалить сообщения: {'✅' if chat_settings.get('delete_message', False) else '❌'}",
                 callback_data='toggle_delete_message'
             )
