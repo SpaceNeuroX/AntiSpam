@@ -59,7 +59,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                 chat_id = message.chat.id
                 await message.reply(f"⚠️ Внимание! Пользователь с ID {new_member.id} присоединился к группе. Это потенциальный спаммер из нашей базы данных!")
 
-    @dp.message_handler(commands=['send_logs'], is_owner = True)
+    @dp.message_handler(commands=['send_logs'], is_admin = True)
     async def send_logs_command(message: Message):
         user_id = message.from_user.id
         if user_id in SPECIAL_USER_IDS:
@@ -70,7 +70,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             await message.reply("Только администратор может получить файл логов.")
             
 
-    @dp.message_handler(commands=['dump_data'], is_owner = True)
+    @dp.message_handler(commands=['dump_data'], is_admin = True)
     async def dump_data_command(message: Message):
         user_id = message.from_user.id
         if user_id not in SPECIAL_USER_IDS:
@@ -148,7 +148,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                             f"Количество сообщений: {message_count} 💬\n"
                             f"Ранг: {rank}")
 
-    @dp.message_handler(commands=['status'], is_owner = True)
+    @dp.message_handler(commands=['status'], is_admin = True)
     async def ping_handler(message: types.Message):
         google_ping_result = ping('google.com')
         telegram_ping_result = ping('149.154.167.40')
@@ -222,7 +222,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             await message.reply(f"✅ Пользователь с ID {user_id_to_check} не находится в списке спамеров.")
 
 
-    @dp.message_handler(commands=['updatebanlist'], is_owner = True)
+    @dp.message_handler(commands=['updatebanlist'], is_admin = True)
     async def update_banlist_command(message: Message):
         try:
             async with aiohttp.ClientSession() as session:
