@@ -113,11 +113,9 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             f"<b>Настройки для группы:</b> {message.chat.title}\n\n"
             f"<b>Порог сообщений:</b> {threshold} ✉️\n\n"
             f"<b>Настройки действий:</b>\n"
-            f"Подписка на уведомления: {subscribe_status} 🔔\n"
             f"Замутить пользователей: {mute_status} 🤐\n"
             f"Удалить сообщения: {delete_message_status} 🗑️\n"
             f"Забанить пользователей: {ban_status} 🚫\n"
-            f"Уведомления: {notification_status} 📢\n"
             f"<i>Первая версия: Lost Samurai 0.5</i>"
         )
         await message.reply(info_text, parse_mode='html', reply_markup=settings_keyboard(chat_id))
