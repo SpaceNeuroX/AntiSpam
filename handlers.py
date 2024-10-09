@@ -411,7 +411,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         if pred_average and user_messages[str(chat_id)][str(user_id)] < threshold:
             keyboard = get_ban_keyboard(message.from_user.id, message.chat.id)
 
-            if chat_settings.get('delete_message', True):
+            if chat_settings.get('delete_message', True) and (not chat_settings.get('ban', False)) and (not chat_settings.get('mute', False)):
                 await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
                 confidence_percent = int(confidence * 100)
                 
@@ -436,6 +436,19 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
             if chat_settings.get('ban', False) and pred_average:
                 await bot.ban_chat_member(chat_id=message.chat.id, user_id=message.from_user.id)
+                await bot.send_message(
+                    chat_id,
+                    f"Пользователь @{message.from_user.username} был забанен в {message.chat.title}:\n\n"
+                    f"<tg-spoiler>{message.text}, вероятность модели: {confidence_percent}%</tg-spoiler>",
+                    parse_mode="HTML"
+                )
+
 
             if chat_settings.get('mute', False) and pred_average:
                 await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id, can_send_messages=False)
+                await bot.send_message(
+                    chat_id,
+                    f"Пользователь @{message.from_user.username} был замучен в {message.chat.title}:\n\n"
+                    f"<tg-spoiler>{message.text}, вероятность модели: {confidence_percent}%</tg-spoiler>",
+                    parse_mode="HTML"
+                )
