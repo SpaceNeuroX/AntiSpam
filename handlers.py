@@ -80,7 +80,8 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         data = {
             "thresholds": load_data(THRESHOLDS_DB),
             "user_messages": load_data(USER_MESSAGES_DB),
-            "chat_settings": load_data(CHAT_SETTINGS_DB)
+            "chat_settings": load_data(CHAT_SETTINGS_DB),
+            "wrong_messages": load_data(WRONG_MESSAGES)
         }
 
         formatted_data = json.dumps(data, ensure_ascii=False, indent=4)
@@ -252,18 +253,28 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         save_data(THRESHOLDS_DB, thresholds)
         await message.reply(f"Порог сообщений успешно установлен: {threshold}")
 
-    @dp.message_handler(commands=['prof'], is_admin = True)
+    @dp.message_handler(commands=['prof'], is_admin=True)
     async def handle_prof_command(message: types.Message):
         argument = message.get_args()
         if argument:
-            is_spam_result, confidence = is_spam(message=message.text, model_name="spamNS_v6", multi_model=False)
-            if is_spam_result:
-                await message.reply(f'❌ Обнаружена реклама! Уверенность: {confidence:.2f}')
+            text_to_check = message.text[len(message.text.split()[0]) + 1:]
 
+            is_spam_result, confidence = is_spam(message=text_to_check, model_name="spamNS_v6", multi_model=False)
+            
+            if is_spam_result:
+                reply_text = f'❌ Обнаружена реклама! Уверенность: {confidence:.2f}'
             else:
-                await message.reply('✅ Текст не содержит рекламы.')
+                reply_text = '✅ Текст не содержит рекламы.'
+
+            keyboard = InlineKeyboardMarkup(row_width=2)
+            button_yes = InlineKeyboardButton("Да, сообщение является рекламой", callback_data='spam_yes')
+            button_no = InlineKeyboardButton("Нет", callback_data='spam_no')
+            keyboard.add(button_yes, button_no)
+
+            await message.reply(reply_text, reply_markup=keyboard)
         else:
             await message.reply('❌ Пожалуйста, введите текст для проверки.')
+
 
     @dp.message_handler(commands=['ban'], is_admin=True)
     async def ban_user(message: types.Message):
@@ -383,6 +394,24 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         original_text = original_messages.get(message.message_id, "Оригинальный текст не найден")
         await handle_message(message, edited=True, original_text=original_text)
 
+    @dp.callback_query_handler(lambda callback_query: callback_query.data == 'spam_yes')
+    async def handle_spam_yes(callback_query: types.CallbackQuery):
+        await callback_query.answer("Вы подтвердили, что сообщение является рекламой.")
+        await callback_query.message.edit_reply_markup()  # Hide the keyboard
+        # Add any additional logic here if needed
+
+    @dp.callback_query_handler(lambda callback_query: callback_query.data == 'spam_no')
+    async def handle_spam_no(callback_query: types.CallbackQuery):
+        user_id = callback_query.from_user.id
+        chat_id = callback_query.message.chat.id
+        await callback_query.answer("Вы подтвердили, что сообщение не является рекламой.")
+        await callback_query.message.edit_reply_markup()  # Hide the keyboard
+        
+        with open(WRONG_MESSAGES, 'r', encoding='utf-8') as file:
+            wrong_messages = json.load(file)
+
+        wrong_messages.append({"user_id": user_id, "chat_id": chat_id, "message": callback_query.message.text})
+
     async def handle_message(message: Message, edited=False, original_text=None):
         pred_average = False
         chat_id = message.chat.id
@@ -427,15 +456,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                     )
 
             if chat_settings.get('ban', False) and pred_average:
-                if has_permission(message):
-                    await bot.send_message(chat_id, "Нельзя забанить администратора!")
-                    return
-
                 await bot.ban_chat_member(chat_id=message.chat.id, user_id=message.from_user.id)
 
             if chat_settings.get('mute', False) and pred_average:
-                if has_permission(message):
-                    await bot.send_message(chat_id, "Нельзя замутить администратора!")
-                    return
-
                 await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id, can_send_messages=False)
