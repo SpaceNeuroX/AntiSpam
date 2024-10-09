@@ -259,19 +259,16 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         if argument:
             text_to_check = message.text[len(message.text.split()[0]) + 1:]
 
+            loading_message = await message.reply('⏳ Проверка текста...')
+
             is_spam_result, confidence = is_spam(message=text_to_check, model_name="spamNS_v6", multi_model=False)
-            
+
+            await loading_message.delete()
+
             if is_spam_result:
-                reply_text = f'❌ Обнаружена реклама! Уверенность: {confidence:.2f}'
+                await message.reply(f'❌ Обнаружена реклама! Уверенность: {confidence:.2f}')
             else:
-                reply_text = '✅ Текст не содержит рекламы.'
-
-            keyboard = InlineKeyboardMarkup(row_width=2)
-            button_yes = InlineKeyboardButton("Да, сообщение является рекламой", callback_data='spam_yes')
-            button_no = InlineKeyboardButton("Нет", callback_data='spam_no')
-            keyboard.add(button_yes, button_no)
-
-            await message.reply(reply_text, reply_markup=keyboard)
+                await message.reply('✅ Текст не содержит рекламы.')
         else:
             await message.reply('❌ Пожалуйста, введите текст для проверки.')
 
@@ -393,24 +390,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
     async def process_edited_message(message: Message):
         original_text = original_messages.get(message.message_id, "Оригинальный текст не найден")
         await handle_message(message, edited=True, original_text=original_text)
-
-    @dp.callback_query_handler(lambda callback_query: callback_query.data == 'spam_yes')
-    async def handle_spam_yes(callback_query: types.CallbackQuery):
-        await callback_query.answer("Вы подтвердили, что сообщение является рекламой.")
-        await callback_query.message.edit_reply_markup()  # Hide the keyboard
-        # Add any additional logic here if needed
-
-    @dp.callback_query_handler(lambda callback_query: callback_query.data == 'spam_no')
-    async def handle_spam_no(callback_query: types.CallbackQuery):
-        user_id = callback_query.from_user.id
-        chat_id = callback_query.message.chat.id
-        await callback_query.answer("Вы подтвердили, что сообщение не является рекламой.")
-        await callback_query.message.edit_reply_markup()  # Hide the keyboard
-        
-        with open(WRONG_MESSAGES, 'r', encoding='utf-8') as file:
-            wrong_messages = json.load(file)
-
-        wrong_messages.append({"user_id": user_id, "chat_id": chat_id, "message": callback_query.message.text})
 
     async def handle_message(message: Message, edited=False, original_text=None):
         pred_average = False
