@@ -38,11 +38,10 @@ def save_chat_settings(data):
 
 async def initialize_chat_settings(chat_id):
         chat_settings = {
-            'subscribe': False,
             'mute': False,
             'delete_message': True,
             'ban': False,
-            'notification': True
+            'delete_links': False
         }
         chat_settings_data = load_chat_settings()
         chat_settings_data[str(chat_id)] = chat_settings

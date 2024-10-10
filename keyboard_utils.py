@@ -25,6 +25,11 @@ def settings_keyboard(chat_id):
             types.InlineKeyboardButton(
                 text=f"🗑 Удалить сообщения: {'✅' if chat_settings.get('delete_message', False) else '❌'}",
                 callback_data='toggle_delete_message'
+            ),
+            types.InlineKeyboardButton(
+                text=f"Удалять ссылки: {'✅' if chat_settings.get('delete_links', False) else '❌'}",
+                callback_data='toggle_delete_links'
             )
+
         )
         return keyboard

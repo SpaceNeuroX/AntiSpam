@@ -391,6 +391,8 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         original_text = original_messages.get(message.message_id, "Оригинальный текст не найден")
         await handle_message(message, edited=True, original_text=original_text)
 
+    import re
+
     async def handle_message(message: Message, edited=False, original_text=None):
         pred_average = False
         chat_id = message.chat.id
@@ -405,6 +407,19 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         save_data(USER_MESSAGES_DB, user_messages)
 
         chat_settings = load_chat_settings().get(str(chat_id), {})
+        toggle_delete_links = chat_settings.get('toggle_delete_links', False)
+
+        url_pattern = re.compile(r"https?://\S+|www\.\S+")
+        has_links = bool(url_pattern.search(message.text))
+
+        if has_links and toggle_delete_links:
+            await bot.delete_message(chat_id=message.chat.id, message_id=message.message_id)
+            await bot.send_message(
+                chat_id,
+                f"Сообщение от @{message.from_user.username} было удалено, так как ссылки запрещены в {message.chat.title}.",
+                parse_mode="HTML"
+            )
+            return
 
         pred_average, confidence = is_spam(message.text, model_name="spamNS_v6")
 
@@ -442,7 +457,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                     f"<tg-spoiler>{message.text}, вероятность модели: {confidence_percent}%</tg-spoiler>",
                     parse_mode="HTML"
                 )
-
 
             if chat_settings.get('mute', False) and pred_average:
                 await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id, can_send_messages=False)
