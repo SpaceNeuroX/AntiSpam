@@ -407,7 +407,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         save_data(USER_MESSAGES_DB, user_messages)
 
         chat_settings = load_chat_settings().get(str(chat_id), {})
-        toggle_delete_links = chat_settings.get('toggle_delete_links', False)
+        toggle_delete_links = chat_settings.get('deletelinks', False)
 
         url_pattern = re.compile(r"https?://\S+|www\.\S+")
         has_links = bool(url_pattern.search(message.text))
