@@ -4,8 +4,12 @@ from aiogram.dispatcher import filters
 from handlers import setup_handlers
 from text_content import get_start_text, get_help_text
 from utils import SPECIAL_USER_IDS
+from dotenv import load_dotenv
+import os
 
-API_TOKEN = "8097084613:AAHxNR0Xa2BE6BxGoqhe5C477pNel4APv-8"
+load_dotenv()
+
+API_TOKEN = os.getenv("API_TOKEN")
 
 bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
