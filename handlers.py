@@ -83,7 +83,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         await bot.send_message(chat_id=CHAT_ID, text=message, parse_mode="Markdown")
 
     def schedule_message():
-        scheduler.add_job(send_periodic_message, 'interval', minutes=1)
+        scheduler.add_job(send_periodic_message, 'interval', minutes=35)
         scheduler.start()
 
     @dp.message_handler(commands=['send_logs'], is_admin = True)
