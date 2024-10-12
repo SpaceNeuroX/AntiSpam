@@ -67,7 +67,6 @@ async def get_random_fact():
             return "Факт не найден, но ты всё равно крут!"
 
 def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
-    schedule_message()
     @dp.message_handler(lambda message: message.new_chat_members)
     async def on_new_chat_members(message: Message):
         for new_member in message.new_chat_members:
@@ -86,7 +85,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
     def schedule_message():
         scheduler.add_job(send_periodic_message, 'interval', minutes=1)
         scheduler.start()
-
 
     @dp.message_handler(commands=['send_logs'], is_admin = True)
     async def send_logs_command(message: Message):
@@ -123,6 +121,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
     @dp.message_handler(commands=['start'])
     async def process_start_command(message: Message):
+        schedule_message()
         start_message = await message.answer(start_text, parse_mode='html')
         dp['start_message_id'] = start_message.message_id
 
