@@ -17,6 +17,7 @@ from ping3 import ping
 from keyboard_utils import get_ban_keyboard
 import logging
 from logging.handlers import RotatingFileHandler
+import re
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -192,12 +193,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             f"- Зарядка: {battery_power_plugged} 🔌"
         )
 
-        # Добавление кнопки для перезапуска
-        keyboard = InlineKeyboardMarkup()
-        restart_button = InlineKeyboardButton(text="Перезапустить сервер", callback_data="restart_server")
-        keyboard.add(restart_button)
-
-        await message.reply(response, parse_mode='Markdown', reply_markup=keyboard)
+        await message.reply(response, parse_mode='Markdown')
     
     @dp.message_handler(commands=['checkban'])
     async def check_ban_command(message: Message):
@@ -391,7 +387,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
         original_text = original_messages.get(message.message_id, "Оригинальный текст не найден")
         await handle_message(message, edited=True, original_text=original_text)
 
-    import re
 
     async def handle_message(message: Message, edited=False, original_text=None):
         pred_average = False
