@@ -67,6 +67,7 @@ async def get_random_fact():
             return "Факт не найден, но ты всё равно крут!"
 
 def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
+    schedule_message()
     @dp.message_handler(lambda message: message.new_chat_members)
     async def on_new_chat_members(message: Message):
         for new_member in message.new_chat_members:
