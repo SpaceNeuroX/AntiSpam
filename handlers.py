@@ -9,7 +9,6 @@ import sys
 from keyboard_utils import settings_keyboard
 from aiogram.types import Message, InputFile
 from io import BytesIO
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from aiogram import Dispatcher, types
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 import psutil
@@ -18,6 +17,15 @@ from keyboard_utils import get_ban_keyboard
 import logging
 from logging.handlers import RotatingFileHandler
 import re
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+
+scheduler = AsyncIOScheduler()
+
+BASE_MESSAGE = ("👋 Привет! Это чат *Venus laboratory*, "
+                "основателя ruSpam моделей и этого бота!\n\n"
+                "💬 *Связаться*: @NeuroSpace\n\n"
+                "🚫 В чате запрещен мат, оскорбления и реклама!\n\n"
+                "🤓 Забавный факт: {}")
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -38,6 +46,7 @@ sys.stdout.reconfigure(encoding='utf-8')
 
 logger.info("Logging configured successfully with UTF-8 support!")
 storage = MemoryStorage()
+CHAT_ID = -1002187415234  # ID чата Venus laboratory
 
 async def has_permission(message: types.Message) -> bool:
     user_id = message.from_user.id
@@ -49,6 +58,14 @@ async def is_group(message: Message):
         await message.reply("Эта команда может использоваться только в группе или супергруппе.")
         return
 
+async def get_random_fact():
+    async with aiohttp.ClientSession() as session:
+        async with session.get('https://uselessfacts.jsph.pl/random.json?language=en') as response:
+            if response.status == 200:
+                data = await response.json()
+                return data['text']
+            return "Факт не найден, но ты всё равно крут!"
+
 def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
     @dp.message_handler(lambda message: message.new_chat_members)
     async def on_new_chat_members(message: Message):
@@ -59,6 +76,16 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             elif new_member.id in banlist:
                 chat_id = message.chat.id
                 await message.reply(f"⚠️ Внимание! Пользователь с ID {new_member.id} присоединился к группе. Это потенциальный спаммер из нашей базы данных!")
+
+    async def send_periodic_message():
+        fact = await get_random_fact()
+        message = BASE_MESSAGE.format(fact)
+        await bot.send_message(chat_id=CHAT_ID, text=message, parse_mode="Markdown")
+
+    def schedule_message():
+        scheduler.add_job(send_periodic_message, 'interval', minutes=1)
+        scheduler.start()
+
 
     @dp.message_handler(commands=['send_logs'], is_admin = True)
     async def send_logs_command(message: Message):
@@ -105,11 +132,9 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
         chat_settings = load_chat_settings().get(str(chat_id), {})
 
-        subscribe_status = "Включено" if chat_settings.get('subscribe', False) else "Выключено"
         mute_status = "Включено" if chat_settings.get('mute', False) else "Выключено"
         delete_message_status = "Включено" if chat_settings.get('delete_message', False) else "Выключено"
         ban_status = "Включено" if chat_settings.get('ban', False) else "Выключено"
-        notification_status = "Включено" if chat_settings.get('notification', False) else "Выключено"
 
         info_text = (
             f"<b>Настройки для группы:</b> {message.chat.title}\n\n"
@@ -276,7 +301,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
             return
         
         user_to_ban = message.reply_to_message.from_user
-
         try:
             await message.chat.kick(user_to_ban.id)
             await message.reply(f"Пользователь {user_to_ban.full_name} был забанен.")
