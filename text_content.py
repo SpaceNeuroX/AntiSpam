@@ -1,5 +1,3 @@
-SPECIAL_USER_IDS = [7264930816, 1529997307]
-
 def get_start_text():
     return (
         '<b>Привет!</b>\n\n'

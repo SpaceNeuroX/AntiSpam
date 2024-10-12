@@ -3,7 +3,6 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.dispatcher import filters
 from handlers import setup_handlers
 from text_content import get_start_text, get_help_text
-from utils import SPECIAL_USER_IDS
 from dotenv import load_dotenv
 import os
 
@@ -16,7 +15,6 @@ dp = Dispatcher(bot)
 
 class IsAdminFilter(filters.BoundFilter):
     key = 'is_admin'
-
     def __init__(self, is_admin: bool):
         self.is_admin = is_admin
 

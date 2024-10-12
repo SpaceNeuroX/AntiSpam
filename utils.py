@@ -13,7 +13,7 @@ WRONG_MESSAGES = "./wrong_messages.json"
 CHAT_SETTINGS_DB = "./chat_settings.json"
 BANLIST_DB = "./banlistDB/banlist.json"
 
-SPECIAL_USER_IDS = [7264930816]
+SPECIAL_USER_IDS = [7264930816, 1529997307]
 
 def load_data(db_file):
     if os.path.exists(db_file):
