@@ -5,22 +5,8 @@ from handlers import setup_handlers
 from text_content import get_start_text, get_help_text
 from dotenv import load_dotenv
 import os
-import sys
-import subprocess
 
 load_dotenv()
-
-
-def install(package):
-    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
-
-try:
-    from apscheduler.schedulers.asyncio import AsyncIOScheduler
-except ImportError:
-    # Если библиотека не найдена, она будет установлена
-    print("APScheduler не найдена. Устанавливаем...")
-    install("apscheduler")
-    from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 API_TOKEN = os.getenv("API_TOKEN")
 

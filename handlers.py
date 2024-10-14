@@ -17,9 +17,6 @@ from keyboard_utils import get_ban_keyboard
 import logging
 from logging.handlers import RotatingFileHandler
 import re
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
-scheduler = AsyncIOScheduler()
 
 BASE_MESSAGE = ("👋 Привет! Это чат *Venus laboratory*, "
                 "основателя ruSpam моделей и этого бота!\n\n"
@@ -77,15 +74,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
                 chat_id = message.chat.id
                 await message.reply(f"⚠️ Внимание! Пользователь с ID {new_member.id} присоединился к группе. Это потенциальный спаммер из нашей базы данных!")
 
-    async def send_periodic_message():
-        fact = await get_random_fact()
-        message = BASE_MESSAGE.format(fact)
-        await bot.send_message(chat_id=CHAT_ID, text=message, parse_mode="Markdown")
-
-    def schedule_message():
-        scheduler.add_job(send_periodic_message, 'interval', minutes=35)
-        scheduler.start()
-
     @dp.message_handler(commands=['send_logs'], is_admin = True)
     async def send_logs_command(message: Message):
         user_id = message.from_user.id
@@ -121,7 +109,6 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
     @dp.message_handler(commands=['start'])
     async def process_start_command(message: Message):
-        schedule_message()
         start_message = await message.answer(start_text, parse_mode='html')
         dp['start_message_id'] = start_message.message_id
 
