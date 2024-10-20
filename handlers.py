@@ -429,7 +429,7 @@ def setup_handlers(dp: Dispatcher, bot, start_text, help_text):
 
         pred_average, confidence = is_spam(message.text, model_name="spamNS_v6")
 
-        if not toggle_delete_links and pred_average:
+        if not toggle_delete_links and has_links:
             return
 
         if pred_average and user_messages[str(chat_id)][str(user_id)] < threshold:
