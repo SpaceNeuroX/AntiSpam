@@ -1,4 +1,0 @@
-aiogram==2.25
-ruSpam
-ping3
-psutil
