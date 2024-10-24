@@ -1,0 +1,151 @@
+2024-10-23 16:27:19,839 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:27:19,880 - INFO - Start polling.
+2024-10-23 16:27:26,422 - ERROR - Cause exception while getting updates.
+Traceback (most recent call last):
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 381, in start_polling
+    updates = await self.bot.get_updates(
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\bot.py", line 110, in get_updates
+    result = await self.request(api.Methods.GET_UPDATES, payload)
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\base.py", line 236, in request
+    return await api.make_request(await self.get_session(), self.server, self.__token, method, data, files,
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 140, in make_request
+    return check_result(method, response.content_type, response.status, await response.text())
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 119, in check_result
+    exceptions.ConflictError.detect(description)
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\utils\exceptions.py", line 140, in detect
+    raise err(cls.text or description)
+aiogram.utils.exceptions.TerminatedByOtherGetUpdates: Terminated by other getupdates request; make sure that only one bot instance is running
+2024-10-23 16:28:14,220 - WARNING - Polling is stopped.
+2024-10-23 16:28:14,300 - INFO - Stop polling...
+2024-10-23 16:28:14,300 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000018801043D30>
+2024-10-23 16:28:15,782 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:28:15,810 - INFO - Start polling.
+2024-10-23 16:33:52,937 - ERROR - Cause exception while getting updates.
+Traceback (most recent call last):
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 381, in start_polling
+    updates = await self.bot.get_updates(
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\bot.py", line 110, in get_updates
+    result = await self.request(api.Methods.GET_UPDATES, payload)
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\base.py", line 236, in request
+    return await api.make_request(await self.get_session(), self.server, self.__token, method, data, files,
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 140, in make_request
+    return check_result(method, response.content_type, response.status, await response.text())
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 119, in check_result
+    exceptions.ConflictError.detect(description)
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\utils\exceptions.py", line 140, in detect
+    raise err(cls.text or description)
+aiogram.utils.exceptions.TerminatedByOtherGetUpdates: Terminated by other getupdates request; make sure that only one bot instance is running
+2024-10-23 16:51:04,109 - WARNING - Polling is stopped.
+2024-10-23 16:51:04,158 - INFO - Stop polling...
+2024-10-23 16:51:04,160 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000020C01773CD0>
+2024-10-23 16:51:05,618 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:51:05,652 - INFO - Start polling.
+2024-10-23 16:51:50,380 - WARNING - Polling is stopped.
+2024-10-23 16:51:50,426 - INFO - Stop polling...
+2024-10-23 16:51:50,426 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000023F03083C10>
+2024-10-23 16:51:51,946 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:51:51,971 - INFO - Start polling.
+2024-10-23 16:52:01,788 - WARNING - Polling is stopped.
+2024-10-23 16:52:01,829 - INFO - Stop polling...
+2024-10-23 16:52:01,829 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002A04A6B3D90>
+2024-10-23 16:52:01,829 - ERROR - Unclosed connector
+connections: ['[(<aiohttp.client_proto.ResponseHandler object at 0x000002A04A65BAC0>, 2338.218)]']
+connector: <aiohttp.connector.TCPConnector object at 0x000002A04A6B3CA0>
+2024-10-23 16:52:01,829 - ERROR - Fatal error on SSL transport
+protocol: <asyncio.sslproto.SSLProtocol object at 0x000002A04A6E01F0>
+transport: <_ProactorSocketTransport fd=300 read=<_OverlappedFuture cancelled>>
+Traceback (most recent call last):
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\sslproto.py", line 690, in _process_write_backlog
+    self._transport.write(chunk)
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 365, in write
+    self._loop_writing(data=bytes(data))
+  File "C:\Users\Kirill\AppData\Local\Programs\Python\Python310\lib\asyncio\proactor_events.py", line 401, in _loop_writing
+    self._write_fut = self._loop._proactor.send(self._sock, data)
+AttributeError: 'NoneType' object has no attribute 'send'
+2024-10-23 16:52:07,978 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:52:08,002 - INFO - Start polling.
+2024-10-23 16:53:45,055 - WARNING - Polling is stopped.
+2024-10-23 16:53:45,086 - INFO - Stop polling...
+2024-10-23 16:53:45,086 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000020088F43D60>
+2024-10-23 16:53:46,634 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:53:46,650 - INFO - Start polling.
+2024-10-23 16:55:55,623 - WARNING - Polling is stopped.
+2024-10-23 16:55:55,664 - INFO - Stop polling...
+2024-10-23 16:55:55,664 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000252E0613C70>
+2024-10-23 16:55:57,112 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:55:57,142 - INFO - Start polling.
+2024-10-23 16:58:12,953 - WARNING - Polling is stopped.
+2024-10-23 16:58:12,999 - INFO - Stop polling...
+2024-10-23 16:58:12,999 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000027615CB3D00>
+2024-10-23 16:58:14,391 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:58:14,412 - INFO - Start polling.
+2024-10-23 17:08:54,497 - WARNING - Polling is stopped.
+2024-10-23 17:08:54,550 - INFO - Stop polling...
+2024-10-23 17:08:54,550 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002580AB83D00>
+2024-10-23 17:08:55,826 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 17:09:01,516 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 17:09:01,546 - INFO - Start polling.
+2024-10-23 17:11:45,018 - WARNING - Polling is stopped.
+2024-10-23 17:11:45,069 - INFO - Stop polling...
+2024-10-23 17:11:45,069 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001C3E022FCA0>
+2024-10-23 17:11:46,437 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 17:11:46,510 - INFO - Start polling.
+2024-10-23 17:12:28,048 - WARNING - Polling is stopped.
+2024-10-23 17:12:28,097 - INFO - Stop polling...
+2024-10-23 17:12:28,102 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000022E0131C280>
+2024-10-23 17:12:29,307 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 17:12:36,470 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 17:12:36,497 - INFO - Start polling.
+2024-10-23 17:14:42,819 - WARNING - Polling is stopped.
+2024-10-23 17:14:42,879 - INFO - Stop polling...
+2024-10-23 17:14:42,879 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002AF50B88310>
+2024-10-23 17:14:44,102 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 17:14:50,039 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 17:14:50,059 - INFO - Start polling.
+2024-10-23 17:15:05,519 - WARNING - Polling is stopped.
+2024-10-23 17:15:05,570 - INFO - Stop polling...
+2024-10-23 17:15:05,570 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000208096EC190>
+2024-10-23 17:15:06,783 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 17:15:06,800 - INFO - Start polling.
+2024-10-23 17:16:50,333 - WARNING - Polling is stopped.
+2024-10-23 17:16:50,370 - INFO - Stop polling...
+2024-10-23 17:16:50,370 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001DB4DCDFC70>
+2024-10-23 17:16:51,484 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 17:16:51,510 - INFO - Start polling.
+2024-10-23 17:20:21,620 - WARNING - Polling is stopped.
+2024-10-23 17:20:21,655 - INFO - Stop polling...
+2024-10-23 17:20:21,664 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000002C3748CFD00>
+2024-10-23 17:20:22,774 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 17:20:22,804 - INFO - Start polling.
+2024-10-23 17:21:21,160 - WARNING - Polling is stopped.
+2024-10-23 17:21:21,201 - INFO - Stop polling...
+2024-10-23 17:21:21,201 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x0000019F44023D60>
+2024-10-23 17:21:22,335 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 17:21:22,366 - INFO - Start polling.
+2024-10-23 17:22:35,931 - WARNING - Polling is stopped.
+2024-10-23 17:22:35,977 - INFO - Stop polling...
+2024-10-23 17:22:35,977 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x000001CF24D63D90>
+2024-10-23 17:22:37,086 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 17:22:37,113 - INFO - Start polling.
+2024-10-23 17:24:35,699 - WARNING - Polling is stopped.
+2024-10-23 17:24:35,739 - INFO - Stop polling...
+2024-10-23 17:24:35,739 - ERROR - Unclosed client session
+client_session: <aiohttp.client.ClientSession object at 0x00000236037B3A90>
+2024-10-23 17:24:36,945 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 17:24:36,970 - INFO - Start polling.

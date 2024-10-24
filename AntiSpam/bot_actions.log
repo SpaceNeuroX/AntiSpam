@@ -1,0 +1,282 @@
+2024-10-23 12:08:35,858 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 12:08:39,561 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 12:11:13,910 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 12:17:22,158 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 12:17:40,380 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 12:17:40,399 - INFO - Start polling.
+2024-10-23 12:26:52,690 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 12:27:43,849 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 12:28:08,454 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 12:28:08,486 - INFO - Start polling.
+2024-10-23 12:28:46,349 - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-5' coro=<Dispatcher._process_polling_updates() done, defined at C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py:407> exception=RetryAfter('Flood control exceeded. Retry in 5 seconds.')>
+Traceback (most recent call last):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 415, in _process_polling_updates
+    for responses in itertools.chain.from_iterable(await self.process_updates(updates, fast)):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 235, in process_updates
+    return await asyncio.gather(*tasks)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 256, in process_update
+    return await self.message_handlers.notify(update.message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 401, in process_message
+    await bot.send_message(chat_id=7264930816, text=forward_message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\bot.py", line 346, in send_message
+    result = await self.request(api.Methods.SEND_MESSAGE, payload)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\base.py", line 236, in request
+    return await api.make_request(await self.get_session(), self.server, self.__token, method, data, files,
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 140, in make_request
+    return check_result(method, response.content_type, response.status, await response.text())
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 111, in check_result
+    raise exceptions.RetryAfter(parameters.retry_after)
+aiogram.utils.exceptions.RetryAfter: Flood control exceeded. Retry in 5 seconds.
+2024-10-23 12:41:12,496 - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-1086' coro=<Dispatcher._process_polling_updates() done, defined at C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py:407> exception=UnboundLocalError("local variable 'confidence_percent' referenced before assignment")>
+Traceback (most recent call last):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 415, in _process_polling_updates
+    for responses in itertools.chain.from_iterable(await self.process_updates(updates, fast)):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 235, in process_updates
+    return await asyncio.gather(*tasks)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 256, in process_update
+    return await self.message_handlers.notify(update.message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 403, in process_message
+    await handle_message(message)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 473, in handle_message
+    f"<tg-spoiler>{message.text}, вероятность модели: {confidence_percent}%</tg-spoiler>",
+UnboundLocalError: local variable 'confidence_percent' referenced before assignment
+2024-10-23 12:43:20,240 - INFO - Файл логов отправлен пользователю с ID 7264930816
+2024-10-23 13:28:37,583 - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-1455' coro=<Dispatcher._process_polling_updates() done, defined at C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py:407> exception=CantRestrictChatOwner("Can't remove chat owner")>
+Traceback (most recent call last):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 415, in _process_polling_updates
+    for responses in itertools.chain.from_iterable(await self.process_updates(updates, fast)):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 235, in process_updates
+    return await asyncio.gather(*tasks)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 256, in process_update
+    return await self.message_handlers.notify(update.message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 403, in process_message
+    await handle_message(message)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 469, in handle_message
+    await bot.ban_chat_member(chat_id=message.chat.id, user_id=message.from_user.id)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\bot.py", line 1853, in ban_chat_member
+    return await self.request(api.Methods.BAN_CHAT_MEMBER, payload)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\base.py", line 236, in request
+    return await api.make_request(await self.get_session(), self.server, self.__token, method, data, files,
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 140, in make_request
+    return check_result(method, response.content_type, response.status, await response.text())
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 115, in check_result
+    exceptions.BadRequest.detect(description)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\utils\exceptions.py", line 140, in detect
+    raise err(cls.text or description)
+aiogram.utils.exceptions.CantRestrictChatOwner: Can't remove chat owner
+2024-10-23 14:56:29,189 - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-2254' coro=<Dispatcher._process_polling_updates() done, defined at C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py:407> exception=UnboundLocalError("local variable 'confidence_percent' referenced before assignment")>
+Traceback (most recent call last):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 415, in _process_polling_updates
+    for responses in itertools.chain.from_iterable(await self.process_updates(updates, fast)):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 235, in process_updates
+    return await asyncio.gather(*tasks)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 256, in process_update
+    return await self.message_handlers.notify(update.message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 403, in process_message
+    await handle_message(message)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 473, in handle_message
+    f"<tg-spoiler>{message.text}, вероятность модели: {confidence_percent}%</tg-spoiler>",
+UnboundLocalError: local variable 'confidence_percent' referenced before assignment
+2024-10-23 14:56:42,381 - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-2261' coro=<Dispatcher._process_polling_updates() done, defined at C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py:407> exception=UnboundLocalError("local variable 'confidence_percent' referenced before assignment")>
+Traceback (most recent call last):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 415, in _process_polling_updates
+    for responses in itertools.chain.from_iterable(await self.process_updates(updates, fast)):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 235, in process_updates
+    return await asyncio.gather(*tasks)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 256, in process_update
+    return await self.message_handlers.notify(update.message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 403, in process_message
+    await handle_message(message)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 473, in handle_message
+    f"<tg-spoiler>{message.text}, вероятность модели: {confidence_percent}%</tg-spoiler>",
+UnboundLocalError: local variable 'confidence_percent' referenced before assignment
+2024-10-23 14:59:03,181 - INFO - Файл логов отправлен пользователю с ID 7264930816
+2024-10-23 15:04:21,049 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:05:06,392 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:05:23,649 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:05:23,681 - INFO - Start polling.
+2024-10-23 15:05:48,415 - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-19' coro=<Dispatcher._process_polling_updates() done, defined at C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py:407> exception=TypeError("Bot.restrict_chat_member() missing 1 required positional argument: 'permissions'")>
+Traceback (most recent call last):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 415, in _process_polling_updates
+    for responses in itertools.chain.from_iterable(await self.process_updates(updates, fast)):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 235, in process_updates
+    return await asyncio.gather(*tasks)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 256, in process_update
+    return await self.message_handlers.notify(update.message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 403, in process_message
+    await handle_message(message)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 472, in handle_message
+    await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id, can_send_messages=False)
+TypeError: Bot.restrict_chat_member() missing 1 required positional argument: 'permissions'
+2024-10-23 15:09:34,812 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:09:34,842 - INFO - Start polling.
+2024-10-23 15:19:04,402 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:20:33,811 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:20:33,842 - INFO - Start polling.
+2024-10-23 15:23:53,026 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:23:53,058 - INFO - Start polling.
+2024-10-23 15:25:41,400 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:25:41,432 - INFO - Start polling.
+2024-10-23 15:39:08,247 - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-70' coro=<Dispatcher._process_polling_updates() done, defined at C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py:407> exception=TypeError("Bot.restrict_chat_member() missing 1 required positional argument: 'permissions'")>
+Traceback (most recent call last):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 415, in _process_polling_updates
+    for responses in itertools.chain.from_iterable(await self.process_updates(updates, fast)):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 235, in process_updates
+    return await asyncio.gather(*tasks)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 256, in process_update
+    return await self.message_handlers.notify(update.message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 403, in process_message
+    await handle_message(message)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 473, in handle_message
+    await bot.restrict_chat_member(chat_id=message.chat.id, user_id=message.from_user.id, can_send_messages=False)
+TypeError: Bot.restrict_chat_member() missing 1 required positional argument: 'permissions'
+2024-10-23 15:50:26,860 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:50:26,914 - INFO - Start polling.
+2024-10-23 15:51:31,244 - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-13' coro=<Dispatcher._process_polling_updates() done, defined at C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py:407> exception=BotBlocked('Forbidden: bot was blocked by the user')>
+Traceback (most recent call last):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 415, in _process_polling_updates
+    for responses in itertools.chain.from_iterable(await self.process_updates(updates, fast)):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 235, in process_updates
+    return await asyncio.gather(*tasks)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 256, in process_update
+    return await self.message_handlers.notify(update.message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 401, in process_message
+    await bot.send_message(chat_id=7264930816, text=forward_message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\bot.py", line 346, in send_message
+    result = await self.request(api.Methods.SEND_MESSAGE, payload)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\base.py", line 236, in request
+    return await api.make_request(await self.get_session(), self.server, self.__token, method, data, files,
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 140, in make_request
+    return check_result(method, response.content_type, response.status, await response.text())
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 121, in check_result
+    exceptions.Unauthorized.detect(description)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\utils\exceptions.py", line 140, in detect
+    raise err(cls.text or description)
+aiogram.utils.exceptions.BotBlocked: Forbidden: bot was blocked by the user
+2024-10-23 15:51:34,915 - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-17' coro=<Dispatcher._process_polling_updates() done, defined at C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py:407> exception=BotBlocked('Forbidden: bot was blocked by the user')>
+Traceback (most recent call last):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 415, in _process_polling_updates
+    for responses in itertools.chain.from_iterable(await self.process_updates(updates, fast)):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 235, in process_updates
+    return await asyncio.gather(*tasks)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 256, in process_update
+    return await self.message_handlers.notify(update.message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 401, in process_message
+    await bot.send_message(chat_id=7264930816, text=forward_message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\bot.py", line 346, in send_message
+    result = await self.request(api.Methods.SEND_MESSAGE, payload)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\base.py", line 236, in request
+    return await api.make_request(await self.get_session(), self.server, self.__token, method, data, files,
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 140, in make_request
+    return check_result(method, response.content_type, response.status, await response.text())
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 121, in check_result
+    exceptions.Unauthorized.detect(description)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\utils\exceptions.py", line 140, in detect
+    raise err(cls.text or description)
+aiogram.utils.exceptions.BotBlocked: Forbidden: bot was blocked by the user
+2024-10-23 15:51:36,544 - ERROR - Task exception was never retrieved
+future: <Task finished name='Task-21' coro=<Dispatcher._process_polling_updates() done, defined at C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py:407> exception=BotBlocked('Forbidden: bot was blocked by the user')>
+Traceback (most recent call last):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 415, in _process_polling_updates
+    for responses in itertools.chain.from_iterable(await self.process_updates(updates, fast)):
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 235, in process_updates
+    return await asyncio.gather(*tasks)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\dispatcher.py", line 256, in process_update
+    return await self.message_handlers.notify(update.message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\dispatcher\handler.py", line 117, in notify
+    response = await handler_obj.handler(*args, **partial_data)
+  File "c:\Users\And\Downloads\AntiSpam-main\AntiSpam-main\handlers.py", line 401, in process_message
+    await bot.send_message(chat_id=7264930816, text=forward_message)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\bot.py", line 346, in send_message
+    result = await self.request(api.Methods.SEND_MESSAGE, payload)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\base.py", line 236, in request
+    return await api.make_request(await self.get_session(), self.server, self.__token, method, data, files,
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 140, in make_request
+    return check_result(method, response.content_type, response.status, await response.text())
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\bot\api.py", line 121, in check_result
+    exceptions.Unauthorized.detect(description)
+  File "C:\Users\And\AppData\Local\Programs\Python\Python310\lib\site-packages\aiogram\utils\exceptions.py", line 140, in detect
+    raise err(cls.text or description)
+aiogram.utils.exceptions.BotBlocked: Forbidden: bot was blocked by the user
+2024-10-23 15:53:00,673 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:53:00,720 - INFO - Start polling.
+2024-10-23 15:56:05,624 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:56:12,340 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:56:19,425 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:57:35,900 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:57:39,103 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:58:23,583 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:58:47,441 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:58:47,498 - INFO - Start polling.
+2024-10-23 15:58:59,053 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 15:58:59,100 - INFO - Start polling.
+2024-10-23 16:00:12,246 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:00:45,110 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:00:45,118 - WARNING - Python-dotenv could not parse statement starting at line 1
+2024-10-23 16:01:15,572 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:01:15,580 - WARNING - Python-dotenv could not parse statement starting at line 1
+2024-10-23 16:02:07,410 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:02:07,418 - WARNING - Python-dotenv could not parse statement starting at line 1
+2024-10-23 16:02:18,618 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:02:18,627 - WARNING - Python-dotenv could not parse statement starting at line 1
+2024-10-23 16:02:18,670 - INFO - Start polling.
+2024-10-23 16:17:07,577 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:17:07,589 - WARNING - Python-dotenv could not parse statement starting at line 1
+2024-10-23 16:18:56,601 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:19:11,578 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:19:20,474 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:20:10,497 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:20:10,557 - INFO - Start polling.
+2024-10-23 16:26:46,942 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:40:12,803 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:41:11,647 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:41:26,964 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:45:06,366 - INFO - Logging configured successfully with UTF-8 support!
+2024-10-23 16:45:06,415 - INFO - Start polling.
