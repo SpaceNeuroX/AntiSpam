@@ -10,7 +10,7 @@ load_dotenv()
 
 API_TOKEN = os.getenv("API_TOKEN")
 
-bot = Bot(token="7753365116:AAFSjj4qNJrhaEN7YQabLVoVsRIWaU_R83Y")
+bot = Bot(token=API_TOKEN)
 dp = Dispatcher(bot)
 
 class IsAdminFilter(filters.BoundFilter):
